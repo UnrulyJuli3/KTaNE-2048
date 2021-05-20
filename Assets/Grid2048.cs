@@ -64,6 +64,6 @@ public class Grid2048
 
 	public bool WithinBounds(Coord position)
 	{
-		return position.x >= 0 && position.x < 4 && position.y >= 0 && position.y < 4;
+		return position.x.InRange(0, 3) && position.y.InRange(0, 3);
 	}
 }

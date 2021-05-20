@@ -54,6 +54,8 @@ public class TP2048Script : TPScript<Module2048Script>
 		yield break;
 	}
 
+
+	// i will make an actual autosolver eventually
 	public override IEnumerator TwitchHandleForcedSolve()
 	{
 		yield return null;
