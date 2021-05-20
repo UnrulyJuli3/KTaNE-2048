@@ -14,6 +14,7 @@ public class Module2048Script : ModuleScript
 	public GameTile TileObject;
 	public KMSelectable[] DirectionButtons;
 	public TextMesh VersionLabel;
+	public TextMesh ScoreLabel;
 
 	private readonly Grid2048 grid = new Grid2048();
 
@@ -22,15 +23,21 @@ public class Module2048Script : ModuleScript
 	private static readonly List<int> startTiles = new List<int> { 2, 2 };
 	private Transform[,] anchors;
 
+	private int initialScore;
+	private int currentScoreValue;
+	private int CurrentScore { get { return currentScoreValue; } set { currentScoreValue = value; ScoreLabel.text = string.Format("{0:n0}", currentScoreValue); } }
+
 	private void Start()
 	{
 		if (!IsEditor) VersionLabel.text = Version;
+		CurrentScore = 0;
 
 		tileScale = TileObject.transform.localScale.x;
 		TileObject.gameObject.SetActive(false);
 		CreateAnchors();
 
 		AddStartTiles();
+		initialScore = CurrentScore;
 
 		grid.EachCell((int x, int y, DigTile tile) => grid.StartingGrid[y, x] = tile == null ? null : new DigTile(tile));
 
@@ -50,7 +57,7 @@ public class Module2048Script : ModuleScript
 		Get<KMSelectable>().Assign(onInteract: OnInteract, onDefocus: OnDefocus);
 	}
 
-	private DigTile[,] lastLoggedGrid = new DigTile[4, 4];
+	private readonly DigTile[,] lastLoggedGrid = new DigTile[4, 4];
 
 	private class GridLog
 	{
@@ -111,6 +118,7 @@ public class Module2048Script : ModuleScript
 		grid.EachCell((int x, int y, DigTile tile) => grid.Cells[y, x] = tile == null ? null : new DigTile(tile), true);
 		Actuate();
 		LogGrid(Direction.Reset);
+		CurrentScore = initialScore;
 	}
 
 	private static readonly Dictionary<Direction, KeyCode> directionKeys = new Dictionary<Direction, KeyCode>
@@ -289,6 +297,8 @@ public class Module2048Script : ModuleScript
 						grid.RemoveTile(tile);
 
 						tile.UpdatePosition(positions.Next);
+
+						CurrentScore += merged.Value;
 
 						if (merged.Value == 2048) Solve();
 					}

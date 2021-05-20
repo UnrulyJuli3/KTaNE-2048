@@ -2509,6 +2509,7 @@ MonoBehaviour:
   - {fileID: 114600323329779306}
   - {fileID: 114474633274151754}
   VersionLabel: {fileID: 102098038851258780}
+  ScoreLabel: {fileID: 102412665762245528}
 --- !u!114 &114861783838573560
 MonoBehaviour:
   m_ObjectHideFlags: 1
