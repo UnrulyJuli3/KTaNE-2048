@@ -213,6 +213,7 @@ public class Module2048Script : ModuleScript
 		foreach (Transform anchor in anchors)
 		{
 			GameObject tile = Instantiate(BlankTile, anchor);
+			tile.transform.localRotation = Quaternion.identity;
 			tile.transform.localPosition = new Vector3(0f, -0.0001f, 0f);
 		}
 		Destroy(BlankTile);
