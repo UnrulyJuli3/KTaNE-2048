@@ -6,8 +6,13 @@ using System.Text;
 // Just calling it "Grid" can cause conflicts with default Unity classes
 public class Grid2048
 {
-	public DigTile[,] Cells = new DigTile[4, 4];
-	public DigTile[,] StartingGrid = new DigTile[4, 4];
+	public int Size;
+	public DigTile[,] Cells;
+
+	public Grid2048(int size)
+	{
+		Size = size;
+	}
 
 	public Coord RandomAvailableCell()
 	{
@@ -26,9 +31,9 @@ public class Grid2048
 	}
 
 	public delegate void EachCellCallback(int x, int y, DigTile tile);
-	public void EachCell(EachCellCallback callback, bool startingGrid = false)
+	public void EachCell(EachCellCallback callback)
 	{
-		if (callback != null) for (int x = 0; x < 4; x++) for (int y = 0; y < 4; y++) callback(x, y, startingGrid ? StartingGrid[y, x] : Cells[y, x]);
+		if (callback != null) for (int x = 0; x < Size; x++) for (int y = 0; y < Size; y++) callback(x, y, Cells[y, x]);
 	}
 
 	public bool CellsAvailable()
@@ -64,6 +69,6 @@ public class Grid2048
 
 	public bool WithinBounds(Coord position)
 	{
-		return position.x.InRange(0, 3) && position.y.InRange(0, 3);
+		return position.x.InRange(0, Size - 1) && position.y.InRange(0, Size - 1);
 	}
 }

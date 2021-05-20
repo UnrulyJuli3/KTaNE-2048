@@ -9,6 +9,8 @@ using Random = UnityEngine.Random;
 
 public class Module2048Script : ModuleScript
 {
+	public int Size;
+
 	public Transform AnchorsWrapper;
 	public GameObject BlankTile;
 	public GameTile TileObject;
@@ -16,33 +18,34 @@ public class Module2048Script : ModuleScript
 	public TextMesh VersionLabel;
 	public TextMesh ScoreLabel;
 
-	private readonly Grid2048 grid = new Grid2048();
+	private Grid2048 grid;
 
 	private float tileScale;
 	private static readonly float gridSize = 0.048f;
-	private static readonly List<int> startTiles = new List<int> { 2, 2 };
+	private static readonly List<int> startTiles = new List<int> { 1024, 512, 256, 128, 64, 32, 16, 8, 8 };
 	private Transform[,] anchors;
 
-	private int initialScore;
 	private int currentScoreValue;
 	private int CurrentScore { get { return currentScoreValue; } set { currentScoreValue = value; ScoreLabel.text = string.Format("{0:n0}", currentScoreValue); } }
 
 	private void Start()
 	{
+		grid = new Grid2048(Size);
+
 		if (!IsEditor) VersionLabel.text = Version;
-		CurrentScore = 0;
+		//CurrentScore = 0;
 
 		tileScale = TileObject.transform.localScale.x;
 		TileObject.gameObject.SetActive(false);
 		CreateAnchors();
 
-		AddStartTiles();
-		initialScore = CurrentScore;
+		//AddStartTiles();
+		//initialScore = CurrentScore;
 
-		grid.EachCell((int x, int y, DigTile tile) => grid.StartingGrid[y, x] = tile == null ? null : new DigTile(tile));
+		Reset();
 
-		Actuate();
-		LogGrid(Direction.Reset);
+		//Actuate();
+		//LogGrid(Direction.Reset);
 
 		for (int i = 0; i < DirectionButtons.Length; i++)
 		{
@@ -57,7 +60,7 @@ public class Module2048Script : ModuleScript
 		Get<KMSelectable>().Assign(onInteract: OnInteract, onDefocus: OnDefocus);
 	}
 
-	private readonly DigTile[,] lastLoggedGrid = new DigTile[4, 4];
+	private DigTile[,] lastLoggedGrid;
 
 	private class GridLog
 	{
@@ -79,11 +82,13 @@ public class Module2048Script : ModuleScript
 			}
 		}
 
+		public int score;
 		public Direction direction;
 		public List<GridLogTile> tiles = new List<GridLogTile>();
 
-		public GridLog(Direction moved)
+		public GridLog(int newScore, Direction moved)
 		{
+			score = newScore;
 			direction = moved;
 		}
 	}
@@ -94,14 +99,15 @@ public class Module2048Script : ModuleScript
 		{
 			bool flag = true;
 			// dumbass tile check. wrote this when i was drunk or something and dont feel like making it not bad
-			for (int y = 0; y < 4; y++) for (int x = 0; x < 4; x++) if (grid.Cells[y, x] == null && lastLoggedGrid[y, x] != null || grid.Cells[y, x] != null && lastLoggedGrid[y, x] == null || grid.Cells[y, x] != null && lastLoggedGrid[y, x] != null && grid.Cells[y, x].Value != lastLoggedGrid[y, x].Value) flag = false;
+			for (int y = 0; y < Size; y++) for (int x = 0; x < Size; x++) if (grid.Cells[y, x] == null && lastLoggedGrid[y, x] != null || grid.Cells[y, x] != null && lastLoggedGrid[y, x] == null || grid.Cells[y, x] != null && lastLoggedGrid[y, x] != null && grid.Cells[y, x].Value != lastLoggedGrid[y, x].Value) flag = false;
 			if (flag) return;
 		}
 
-		for (int y = 0; y < 4; y++) for (int x = 0; x < 4; x++) lastLoggedGrid[y, x] = grid.Cells[y, x] ?? null;
+		lastLoggedGrid = new DigTile[Size, Size];
+		for (int y = 0; y < Size; y++) for (int x = 0; x < Size; x++) lastLoggedGrid[y, x] = grid.Cells[y, x] ?? null;
 
 
-		GridLog log = new GridLog(direction);
+		GridLog log = new GridLog(CurrentScore, direction);
 		grid.EachCell(delegate (int x, int y, DigTile tile)
 		{
 			if (tile != null) log.tiles.Add(new GridLog.GridLogTile(tile));
@@ -115,10 +121,11 @@ public class Module2048Script : ModuleScript
 
 	private void Reset()
 	{
-		grid.EachCell((int x, int y, DigTile tile) => grid.Cells[y, x] = tile == null ? null : new DigTile(tile), true);
+		grid.Cells = new DigTile[Size, Size];
+		CurrentScore = 0;
+		AddStartTiles();
 		Actuate();
 		LogGrid(Direction.Reset);
-		CurrentScore = initialScore;
 	}
 
 	private static readonly Dictionary<Direction, KeyCode> directionKeys = new Dictionary<Direction, KeyCode>
@@ -190,7 +197,7 @@ public class Module2048Script : ModuleScript
 		return new Coord(0, 1);
 	}
 
-	internal void MoveDirection(Direction direction)
+	internal void MoveDirection(Direction direction, bool noLog = false)
 	{
 		ButtonEffect(DirectionButtons[(int)direction], 0.5f, KMSoundOverride.SoundEffect.ButtonPress);
 
@@ -202,20 +209,20 @@ public class Module2048Script : ModuleScript
 			return;
 		}
 
-		Move(direction);
+		Move(direction, noLog);
 	}
 
 	private void CreateAnchors()
 	{
-		anchors = new Transform[4, 4];
+		anchors = new Transform[Size, Size];
 
-		for (int y = 0; y < 4; y++)
+		for (int y = 0; y < Size; y++)
 		{
-			for (int x = 0; x < 4; x++)
+			for (int x = 0; x < Size; x++)
 			{
 				GameObject anchor = new GameObject("anchor{0}{1}".Form(x, y));
 				anchor.transform.parent = AnchorsWrapper;
-				anchor.transform.localPosition = new Vector3(Mathf.Lerp(-gridSize, gridSize, x / 3f), 0f, Mathf.Lerp(gridSize, -gridSize, y / 3f));
+				anchor.transform.localPosition = new Vector3(Mathf.Lerp(-gridSize, gridSize, (float)x / (Size - 1)), 0f, Mathf.Lerp(gridSize, -gridSize, (float)y / (Size - 1)));
 				anchor.transform.localScale = Vector3.one;
 				anchor.transform.localRotation = Quaternion.identity;
 				anchors[y, x] = anchor.transform;
@@ -228,11 +235,13 @@ public class Module2048Script : ModuleScript
 			tile.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
 			tile.transform.localPosition = new Vector3(0f, -0.0001f, 0f);
 		}
-		Destroy(BlankTile);
+		BlankTile.SetActive(false);
 	}
 
 	private void AddStartTiles()
 	{
+		/* foreach (int value in startTiles) AddRandomTile(value);
+		MoveDirection((Direction)Random.Range(0, 4)); */
 		for (int i = 0; i < 2; i++) AddRandomTile();
 	}
 
@@ -265,13 +274,13 @@ public class Module2048Script : ModuleScript
 		tile.UpdatePosition(cell);
 	}
 
-	private void Move(Direction direction)
+	private void Move(Direction direction, bool noLog)
 	{
 		Coord cell;
 		DigTile tile;
 
 		Coord vector = GetDirectionalOffset(direction);
-		Traversals traversals = Traversals.BuildTraversals(vector);
+		Traversals traversals = Traversals.BuildTraversals(Size, vector);
 		bool moved = false;
 
 		PrepareTiles();
@@ -313,10 +322,10 @@ public class Module2048Script : ModuleScript
 		{
 			AddRandomTile();
 
-			// Game over if no moves
-
 			Actuate();
-			LogGrid(direction);
+			if (!noLog) LogGrid(direction);
+
+			if (!MovesAvailable()) GameOver();
 		}
 	}
 
@@ -325,11 +334,11 @@ public class Module2048Script : ModuleScript
 		public List<int> x = new List<int>();
 		public List<int> y = new List<int>();
 
-		public static Traversals BuildTraversals(Coord vector)
+		public static Traversals BuildTraversals(int size, Coord vector)
 		{
 			Traversals traversals = new Traversals();
 
-			for (int pos = 0; pos < 4; pos++)
+			for (int pos = 0; pos < size; pos++)
 			{
 				traversals.x.Add(pos);
 				traversals.y.Add(pos);
@@ -406,12 +415,9 @@ public class Module2048Script : ModuleScript
 		{
 			StartCoroutine(TileAddMerge(gameTile.transform));
 			foreach (DigTile merged in tile.MergedFrom) ActuateTile(merged);
-			gameTile.transform.localPosition += new Vector3(0f, 0.0014f, 0f);
+			gameTile.transform.localPosition += new Vector3(0f, 0.0002f, 0f);
 		}
-		else
-		{
-			StartCoroutine(TileAddNew(gameTile.transform));
-		}
+		else StartCoroutine(TileAddNew(gameTile.transform));
 
 		ActuateddTiles.Add(gameTile);
 	}
@@ -476,6 +482,36 @@ public class Module2048Script : ModuleScript
 	private void GameOver()
 	{
 		Strike("Out of moves!");
-		
+		Reset();
+	}
+
+	private bool MovesAvailable()
+	{
+		return grid.CellsAvailable() || TileMatchesAvailable();
+	}
+
+	private bool TileMatchesAvailable()
+	{
+		for (int y = 0; y < Size; y++)
+		{
+			for (int x = 0; x < Size; x++)
+			{
+				DigTile tile = grid.CellContent(new Coord(x, y));
+
+				if (tile != null)
+				{
+					for (int direction = 0; direction < 4; direction++)
+					{
+						Coord vector = GetDirectionalOffset((Direction)direction);
+						Coord cell = new Coord(x + vector.x, y + vector.y);
+
+						DigTile other = grid.CellContent(cell);
+
+						if (other != null && other.Value == tile.Value) return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }
