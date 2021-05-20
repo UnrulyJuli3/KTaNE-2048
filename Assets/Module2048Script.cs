@@ -12,6 +12,8 @@ public class Module2048Script : ModuleScript
 	public GameTile TileObject;
 	public KMSelectable[] DirectionButtons;
 
+	private Grid2048 grid = new Grid2048();
+
 	private float tileScale;
 	private static readonly float gridSize = 0.048f;
 	private Transform[,] anchors;
