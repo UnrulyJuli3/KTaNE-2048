@@ -206,6 +206,7 @@ public class Module2048Script : ModuleScript
 				anchor.transform.parent = AnchorsWrapper;
 				anchor.transform.localPosition = new Vector3(Mathf.Lerp(-gridSize, gridSize, x / 3f), 0f, Mathf.Lerp(gridSize, -gridSize, y / 3f));
 				anchor.transform.localScale = Vector3.one;
+				anchor.transform.localRotation = Quaternion.identity;
 				anchors[y, x] = anchor.transform;
 			}
 		}
