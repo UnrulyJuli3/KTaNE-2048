@@ -13,8 +13,9 @@ public class Module2048Script : ModuleScript
 	public GameObject BlankTile;
 	public GameTile TileObject;
 	public KMSelectable[] DirectionButtons;
+	public TextMesh VersionLabel;
 
-	private Grid2048 grid = new Grid2048();
+	private readonly Grid2048 grid = new Grid2048();
 
 	private float tileScale;
 	private static readonly float gridSize = 0.048f;
@@ -23,6 +24,8 @@ public class Module2048Script : ModuleScript
 
 	private void Start()
 	{
+		if (!IsEditor) VersionLabel.text = Version;
+
 		tileScale = TileObject.transform.localScale.x;
 		TileObject.gameObject.SetActive(false);
 		CreateAnchors();
