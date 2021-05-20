@@ -61,6 +61,7 @@ public class TP2048Script : TPScript<Module2048Script>
 		yield return null;
 		Module.AddRandomTile(2048);
 		Module.Actuate();
+		Module.Solve();
 		yield break;
 	}
 }
