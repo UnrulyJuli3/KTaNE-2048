@@ -1,7 +1,9 @@
 ﻿using KeepCoding;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -16,9 +18,8 @@ public class Module2048Script : ModuleScript
 
 	private float tileScale;
 	private static readonly float gridSize = 0.048f;
+	private static readonly List<int> startTiles = new List<int> { 2, 2 };
 	private Transform[,] anchors;
-	//private GameTile[,] currentGrid = new GameTile[4, 4];
-	//private readonly GameTile[,] initialState = new GameTile[4, 4];
 
 	private void Start()
 	{
@@ -26,7 +27,12 @@ public class Module2048Script : ModuleScript
 		TileObject.gameObject.SetActive(false);
 		CreateAnchors();
 
-		//for (int y = 0; y < 4; y++) for (int x = 0; x < 4; x++) initialState[y, x] = currentGrid[y, x];
+		AddStartTiles();
+
+		grid.EachCell((int x, int y, DigTile tile) => grid.StartingGrid[y, x] = tile == null ? null : new DigTile(tile));
+
+		Actuate();
+		LogGrid(Direction.Reset);
 
 		for (int i = 0; i < DirectionButtons.Length; i++)
 		{
@@ -41,27 +47,68 @@ public class Module2048Script : ModuleScript
 		Get<KMSelectable>().Assign(onInteract: OnInteract, onDefocus: OnDefocus);
 	}
 
-	private class Traversals
+	private DigTile[,] lastLoggedGrid = new DigTile[4, 4];
+
+	private class GridLog
 	{
-		public List<int> x = new List<int>();
-		public List<int> y = new List<int>();
-
-		public static Traversals BuildTraversals(Coord vector)
+		public class GridLogTile
 		{
-			Traversals traversals = new Traversals();
+			public int value;
+			public int x;
+			public int y;
+			public Coord previousPosition;
+			public List<GridLogTile> mergedFrom;
 
-			for (int pos = 0; pos < 4; pos++) {
-				traversals.x.Add(pos);
-				traversals.y.Add(pos);
+			public GridLogTile(DigTile tile)
+			{
+				value = tile.Value;
+				x = tile.X;
+				y = tile.Y;
+				previousPosition = tile.PreviousPosition;
+				mergedFrom = tile.MergedFrom == null ? null : tile.MergedFrom.Select(t => new GridLogTile(t)).ToList();
 			}
+		}
 
-			if (vector.x > 0) traversals.x.Reverse();
-			if (vector.y > 0) traversals.y.Reverse();
+		public Direction direction;
+		public List<GridLogTile> tiles = new List<GridLogTile>();
 
-			return traversals;
+		public GridLog(Direction moved)
+		{
+			direction = moved;
 		}
 	}
 
+	private void LogGrid(Direction direction)
+	{
+		if (lastLoggedGrid != null)
+		{
+			bool flag = true;
+			// dumbass tile check. wrote this when i was drunk or something and dont feel like making it not bad
+			for (int y = 0; y < 4; y++) for (int x = 0; x < 4; x++) if (grid.Cells[y, x] == null && lastLoggedGrid[y, x] != null || grid.Cells[y, x] != null && lastLoggedGrid[y, x] == null || grid.Cells[y, x] != null && lastLoggedGrid[y, x] != null && grid.Cells[y, x].Value != lastLoggedGrid[y, x].Value) flag = false;
+			if (flag) return;
+		}
+
+		for (int y = 0; y < 4; y++) for (int x = 0; x < 4; x++) lastLoggedGrid[y, x] = grid.Cells[y, x] ?? null;
+
+
+		GridLog log = new GridLog(direction);
+		grid.EachCell(delegate (int x, int y, DigTile tile)
+		{
+			if (tile != null) log.tiles.Add(new GridLog.GridLogTile(tile));
+		});
+
+		Log("Current grid: {0}", JsonConvert.SerializeObject(log, Formatting.None, new JsonSerializerSettings
+		{
+			NullValueHandling = NullValueHandling.Ignore
+		}));
+	}
+
+	private void Reset()
+	{
+		grid.EachCell((int x, int y, DigTile tile) => grid.Cells[y, x] = tile == null ? null : new DigTile(tile), true);
+		Actuate();
+		LogGrid(Direction.Reset);
+	}
 
 	private static readonly Dictionary<Direction, KeyCode> directionKeys = new Dictionary<Direction, KeyCode>
 	{
@@ -109,7 +156,7 @@ public class Module2048Script : ModuleScript
 		}
 	}
 
-	private enum Direction
+	internal enum Direction
 	{
 		Up,
 		Left,
@@ -132,19 +179,19 @@ public class Module2048Script : ModuleScript
 		return new Coord(0, 1);
 	}
 
-	private void MoveDirection(Direction direction)
+	internal void MoveDirection(Direction direction)
 	{
+		ButtonEffect(DirectionButtons[(int)direction], 0.5f, KMSoundOverride.SoundEffect.ButtonPress);
+
+		if (IsSolved) return;
+
 		if (direction.Equals(Direction.Reset))
 		{
-			Log("Reset module");
-			//ResetToOriginalState();
+			Reset();
 			return;
 		}
-		Log("Moved {0}", direction.ToString().ToLowerInvariant());
-		ButtonEffect(DirectionButtons[(int)direction], 0.7f, KMSoundOverride.SoundEffect.ButtonPress);
 
-		Coord vector = GetDirectionalOffset(direction);
-		
+		Move(direction);
 	}
 
 	private void CreateAnchors()
@@ -171,35 +218,211 @@ public class Module2048Script : ModuleScript
 		Destroy(BlankTile);
 	}
 
-	/* private enum TileAddAnim
+	private void AddStartTiles()
 	{
-		New,
-		Merge
+		for (int i = 0; i < 2; i++) AddRandomTile();
 	}
 
-	private void CreateTile(int value, int x, int y, TileAddAnim animationType)
+	internal void AddRandomTile(int? valueOverride = null)
 	{
-		if (currentGrid[y, x] != null) Destroy(currentGrid[y, x].gameObject);
-
-		GameTile tile = Instantiate(TileObject, AnchorsWrapper);
-		currentGrid[y, x] = tile;
-		tile.gameObject.SetActive(true);
-		tile.SetValue(value);
-		tile.transform.localPosition = anchors[y, x].localPosition;
-		switch (animationType)
+		if (grid.CellsAvailable())
 		{
-			case TileAddAnim.New:
-				StartCoroutine(TileAddNew(tile.transform));
-				break;
-			case TileAddAnim.Merge:
-				StartCoroutine(TileAddMerge(tile.transform));
-				break;
+			int value = valueOverride == null ? Random.value < 0.9f ? 2 : 4 : (int)valueOverride;
+			DigTile tile = new DigTile(grid.RandomAvailableCell(), value);
+			grid.InsertTile(tile);
 		}
+	}
+
+	private void PrepareTiles()
+	{
+		grid.EachCell(delegate (int x, int y, DigTile tile)
+		{
+			if (tile != null)
+			{
+				tile.MergedFrom = null;
+				tile.SavePosition();
+			}
+		});
+	}
+
+	private void MoveTile(DigTile tile, Coord cell)
+	{
+		grid.Cells[tile.Y, tile.X] = null;
+		grid.Cells[cell.y, cell.x] = tile;
+		tile.UpdatePosition(cell);
+	}
+
+	private void Move(Direction direction)
+	{
+		Coord cell;
+		DigTile tile;
+
+		Coord vector = GetDirectionalOffset(direction);
+		Traversals traversals = Traversals.BuildTraversals(vector);
+		bool moved = false;
+
+		PrepareTiles();
+
+		foreach (int x in traversals.x)
+		{
+			foreach (int y in traversals.y)
+			{
+				cell = new Coord(x, y);
+				tile = grid.CellContent(cell);
+
+				if (tile != null)
+				{
+					FarthestPosition positions = FindFarthestPosition(cell, vector);
+					DigTile next = grid.CellContent(positions.Next);
+
+					if (next != null && next.Value == tile.Value && next.MergedFrom == null)
+					{
+						DigTile merged = new DigTile(positions.Next, tile.Value * 2);
+						merged.MergedFrom = new List<DigTile> { tile, next };
+
+						grid.InsertTile(merged);
+						grid.RemoveTile(tile);
+
+						tile.UpdatePosition(positions.Next);
+
+						if (merged.Value == 2048) Solve();
+					}
+					else MoveTile(tile, positions.Farthest);
+
+					if (!PositionsEqual(cell, tile)) moved = true;
+				}
+			}
+		}
+
+		if (moved)
+		{
+			AddRandomTile();
+
+			// Game over if no moves
+
+			Actuate();
+			LogGrid(direction);
+		}
+	}
+
+	private class Traversals
+	{
+		public List<int> x = new List<int>();
+		public List<int> y = new List<int>();
+
+		public static Traversals BuildTraversals(Coord vector)
+		{
+			Traversals traversals = new Traversals();
+
+			for (int pos = 0; pos < 4; pos++)
+			{
+				traversals.x.Add(pos);
+				traversals.y.Add(pos);
+			}
+
+			if (vector.x > 0) traversals.x.Reverse();
+			if (vector.y > 0) traversals.y.Reverse();
+
+			return traversals;
+		}
+	}
+
+	private class FarthestPosition
+	{
+		public Coord Farthest;
+		public Coord Next;
+		
+		public FarthestPosition(Coord farthest, Coord next)
+		{
+			Farthest = farthest;
+			Next = next;
+		}
+	}
+
+	private FarthestPosition FindFarthestPosition(Coord cell, Coord vector)
+	{
+		Coord previous;
+
+		do
+		{
+			previous = cell;
+			cell = new Coord(previous.x + vector.x, previous.y + vector.y);
+		} while (grid.WithinBounds(cell) && grid.CellAvailable(cell));
+
+		return new FarthestPosition(previous, cell);
+	}
+
+	private bool PositionsEqual(Coord first, DigTile second)
+	{
+		return PositionsEqual(first, new Coord(second.X, second.Y));
+	}
+
+	private bool PositionsEqual(Coord first, Coord second)
+	{
+		return first.x == second.x && first.y == second.y;
+	}
+
+
+	private readonly List<GameTile> ActuateddTiles = new List<GameTile>();
+
+	internal void Actuate()
+	{
+		foreach (GameTile tile in ActuateddTiles) Destroy(tile.gameObject);
+		ActuateddTiles.Clear();
+
+		foreach (DigTile tile in grid.Cells) if (tile != null) ActuateTile(tile);
+	}
+
+	private void ActuateTile(DigTile tile)
+	{
+		GameTile gameTile = Instantiate(TileObject, AnchorsWrapper);
+		gameTile.gameObject.SetActive(true);
+		gameTile.SetValue(tile.Value);
+
+		Coord anchorPosition = tile.PreviousPosition ?? new Coord(tile.X, tile.Y);
+
+		gameTile.transform.localPosition = anchors[anchorPosition.y, anchorPosition.x].localPosition;
+
+		if (tile.PreviousPosition != null)
+		{
+			StartCoroutine(ActuateTileToPosition(gameTile.transform, anchorPosition, new Coord(tile.X, tile.Y)));
+		}
+		else if (tile.MergedFrom != null)
+		{
+			StartCoroutine(TileAddMerge(gameTile.transform));
+			foreach (DigTile merged in tile.MergedFrom) ActuateTile(merged);
+			gameTile.transform.localPosition += new Vector3(0f, 0.0014f, 0f);
+		}
+		else
+		{
+			StartCoroutine(TileAddNew(gameTile.transform));
+		}
+
+		ActuateddTiles.Add(gameTile);
+	}
+
+	private IEnumerator ActuateTileToPosition(Transform tile, Coord oldPosition, Coord newPosition)
+	{
+		Vector3 oldAnchor = anchors[oldPosition.y, oldPosition.x].localPosition;
+		Vector3 newAnchor = anchors[newPosition.y, newPosition.x].localPosition;
+
+		float duration = 0.1f;
+		float initialTime = Time.time;
+		while (Time.time - initialTime < duration && tile)
+		{
+			float lerp = (Time.time - initialTime) / duration;
+			float xPos = Mathf.SmoothStep(oldAnchor.x, newAnchor.x, lerp);
+			float zPos = Mathf.SmoothStep(oldAnchor.z, newAnchor.z, lerp);
+			tile.localPosition = new Vector3(xPos, 0f, zPos);
+			yield return null;
+		}
+		if (tile) tile.localPosition = newAnchor;
+		yield break;
 	}
 
 	private IEnumerator TileAddNew(Transform tile)
 	{
-		float duration = 0.3f;
+		float duration = 0.2f;
 		float initialTime = Time.time;
 		while (Time.time - initialTime < duration && tile)
 		{
@@ -219,7 +442,7 @@ public class Module2048Script : ModuleScript
 		while (Time.time - initialTime < duration && tile)
 		{
 			float lerp = (Time.time - initialTime) / duration;
-			float scale = Mathf.SmoothStep(tileScale * 0.7f, tileScale * 1.3f, lerp);
+			float scale = Mathf.SmoothStep(0f, tileScale * 1.3f, lerp);
 			tile.localScale = new Vector3(scale, scale, scale);
 			yield return null;
 		}
@@ -233,44 +456,11 @@ public class Module2048Script : ModuleScript
 		}
 		if (tile) tile.localScale = new Vector3(tileScale, tileScale, tileScale);
 		yield break;
-	} */
-
-
-
-	/* private IEnumerator MoveTileToPosition(int oldX, int oldY, int newX, int newY, int? newValue = null)
-	{
-		GameTile tile = currentGrid[oldY, oldX];
-
-		Vector3 oldAnchor = anchors[oldY, oldX].localPosition;
-		Vector3 newAnchor = anchors[newY, newX].localPosition;
-
-		float duration = 0.3f;
-		float initialTime = Time.time;
-		while (Time.time - initialTime < duration)
-		{
-			float lerp = EaseIn((Time.time - initialTime) / duration);
-			float xPos = Mathf.Lerp(oldAnchor.x, newAnchor.x, lerp);
-			float zPos = Mathf.Lerp(oldAnchor.z, newAnchor.z, lerp);
-			tile.transform.localPosition = new Vector3(xPos, 0f, zPos);
-			yield return null;
-		}
-		tile.transform.localPosition = newAnchor;
-
-		if (newValue != null)
-		{
-			Destroy(tile.gameObject);
-			CreateTile((int)newValue, newX, newY, TileAddAnim.Merge);
-		}
-		yield break;
 	}
-
-	private static float EaseIn(float k)
-	{
-		return k * k * k;
-	} */
 
 	private void GameOver()
 	{
 		Strike("Out of moves!");
+		
 	}
 }

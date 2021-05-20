@@ -21,14 +21,11 @@ public class TileStyles
 		new TileStyle(2048, "edc22e")
 	};
 
-	public static readonly string BlackColor = "776e65";
-	public static readonly string WhiteColor = "f9f6f2";
-
 	public static Color ParseColor(string colorString)
 	{
 		Color color;
 		if (ColorUtility.TryParseHtmlString("#" + colorString, out color)) return color;
-		return Color.black;
+		return Color.red;
 	}
 
 	public static TileStyle GetStyleForValue(int value)
@@ -42,10 +39,14 @@ public class TileStyle
 	public int Value;
 	public Color Color;
 	public Color TextColor;
+
+	private static readonly string blackColor = "776e65";
+	private static readonly string whiteColor = "f9f6f2";
+
 	public TileStyle(int value, string colorString, bool blackText = false)
 	{
 		Value = value;
 		Color = TileStyles.ParseColor(colorString);
-		TextColor = TileStyles.ParseColor(blackText ? TileStyles.BlackColor : TileStyles.WhiteColor);
+		TextColor = TileStyles.ParseColor(blackText ? blackColor : whiteColor);
 	}
 }

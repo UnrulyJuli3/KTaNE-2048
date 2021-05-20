@@ -433,6 +433,7 @@ GameObject:
   - component: {fileID: 114140399508950130}
   - component: {fileID: 114094087081694352}
   - component: {fileID: 114843997798024564}
+  - component: {fileID: 114442551269354822}
   m_Layer: 0
   m_Name: 2048
   m_TagString: Untagged
@@ -719,7 +720,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1550598699243482}
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.0684, y: 0.016319, z: -0.0684}
+  m_LocalPosition: {x: -0.0684, y: 0.0177, z: -0.0684}
   m_LocalScale: {x: 1.1176624, y: 1.1176618, z: 1.1176618}
   m_Children:
   - {fileID: 4749750417833178}
@@ -1658,6 +1659,18 @@ MonoBehaviour:
   AllowSelectionWrapY: 0
   ForceSelectionHighlight: 0
   ForceInteractionHighlight: 0
+--- !u!114 &114442551269354822
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1783089377010868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d461d5f418759c418916968212b7852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TwitchHelpMessage: '!{0} move up | !{0} move d | !{0} reset'
 --- !u!114 &114474633274151754
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1717,8 +1730,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Label: {fileID: 102674646061407490}
   TileRenderer: {fileID: 23933895096245762}
-  Value: 0
-  MergedFrom: []
 --- !u!114 &114559449635233124
 MonoBehaviour:
   m_ObjectHideFlags: 1

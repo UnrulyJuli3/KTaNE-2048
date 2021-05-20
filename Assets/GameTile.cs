@@ -7,31 +7,9 @@ public class GameTile : MonoBehaviour
 	public TextMesh Label;
 	public Renderer TileRenderer;
 
-	[HideInInspector]
-	public int Value;
-	[HideInInspector]
-	public int X;
-	[HideInInspector]
-	public int Y;
-	[HideInInspector]
-	public Coord PreviousPosition;
-	[HideInInspector]
-	public List<GameTile> MergedFrom;
-
-	public void SavePosition()
+	private float CalculateFontMultiplier(int value)
 	{
-		PreviousPosition = new Coord(X, Y);
-	}
-
-	public void UpdatePosition(Coord position)
-	{
-		X = position.x;
-		Y = position.y;
-	}
-
-	private float CalculateFontMultiplier()
-	{
-		switch (Value.ToString().Length)
+		switch (value.ToString().Length)
 		{
 			case 3:
 				return 0.8f;
@@ -45,18 +23,17 @@ public class GameTile : MonoBehaviour
 		return 1f;
 	}
 
-	private int CalculateFontSize()
+	private int CalculateFontSize(int value = 2)
 	{
-		return Mathf.RoundToInt(80f * CalculateFontMultiplier());
+		return Mathf.RoundToInt(80f * CalculateFontMultiplier(value));
 	}
 
 	public void SetValue(int value)
 	{
-		Value = value;
-		Label.text = Value.ToString();
-		Label.fontSize = CalculateFontSize();
+		Label.text = value.ToString();
+		Label.fontSize = CalculateFontSize(value);
 
-		TileStyle style = TileStyles.GetStyleForValue(Value);
+		TileStyle style = TileStyles.GetStyleForValue(value);
 		TileRenderer.material.color = style.Color;
 		Label.color = style.TextColor;
 	}
