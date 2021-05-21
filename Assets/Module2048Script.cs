@@ -17,6 +17,7 @@ public class Module2048Script : ModuleScript
 	public GameTile TileObject;
 	public KMSelectable[] DirectionButtons;
 	public Renderer VersionLabelBacking;
+	public TextMesh VersionTitle;
 	public TextMesh VersionLabel;
 	public TextMesh ScoreLabel;
 	public GameObject Win2048;
@@ -35,6 +36,7 @@ public class Module2048Script : ModuleScript
 
 	private void Start()
 	{
+		Log("Setup [{0}]", Size);
 		HideDirectionHighlights(false);
 
 		grid = new Grid2048(Size);
@@ -67,7 +69,7 @@ public class Module2048Script : ModuleScript
 		if (TwitchPlaysActive || Get<TP2048Script>().IsTwitchPlaysActive())
 		{
 			Goal = 32;
-			VersionLabel.text = "TP";
+			VersionTitle.text = "twitch";
 			Color twitchColor;
 			if (ColorUtility.TryParseHtmlString("#9147ff", out twitchColor)) VersionLabelBacking.material.color = twitchColor;
 		}

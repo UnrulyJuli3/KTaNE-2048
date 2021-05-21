@@ -2883,6 +2883,7 @@ MonoBehaviour:
   - {fileID: 114600323329779306}
   - {fileID: 114474633274151754}
   VersionLabelBacking: {fileID: 23361473008079034}
+  VersionTitle: {fileID: 102751695688818258}
   VersionLabel: {fileID: 102098038851258780}
   ScoreLabel: {fileID: 102156804375554748}
   Win2048: {fileID: 1929719202218902}
