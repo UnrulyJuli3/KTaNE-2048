@@ -28,9 +28,11 @@ public class TileStyles
 		return Color.red;
 	}
 
+	public static readonly TileStyle LargeTileStyle = new TileStyle(-1, "3c3a33");
+
 	public static TileStyle GetStyleForValue(int value)
 	{
-		return Styles.Any(s => s.Value == value) ? Styles.First(s => s.Value == value) : Styles.First();
+		return Styles.Any(s => s.Value == value) ? Styles.First(s => s.Value == value) : LargeTileStyle;
 	}
 }
 

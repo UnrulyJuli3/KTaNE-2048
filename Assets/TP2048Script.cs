@@ -59,9 +59,17 @@ public class TP2048Script : TPScript<Module2048Script>
 	public override IEnumerator TwitchHandleForcedSolve()
 	{
 		yield return null;
-		Module.AddRandomTile(2048);
+		
+		// free up cells if there are none to put the goal tile
+		if (!Module.grid.CellsAvailable()) Module.grid.Cells = new DigTile[Module.Size, Module.Size];
+
+		// add goal tile
+		Module.AddRandomTile(Module.Goal);
+
+		// display
 		Module.Actuate();
+
+		// actuate doesn't actually do the solving calculations so... solve manually
 		Module.Solve();
-		yield break;
 	}
 }

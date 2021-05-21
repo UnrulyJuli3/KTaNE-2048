@@ -10,6 +10,7 @@ using Random = UnityEngine.Random;
 public class Module2048Script : ModuleScript
 {
 	public int Size;
+	public int Goal;
 
 	public Transform AnchorsWrapper;
 	public GameObject BlankTile;
@@ -17,20 +18,27 @@ public class Module2048Script : ModuleScript
 	public KMSelectable[] DirectionButtons;
 	public TextMesh VersionLabel;
 	public TextMesh ScoreLabel;
+	public GameObject Win2048;
 
-	private Grid2048 grid;
+	internal Grid2048 grid;
 
 	private float tileScale;
 	private static readonly float gridSize = 0.048f;
-	private static readonly List<int> startTiles = new List<int> { 1024, 512, 256, 128, 64, 32, 16, 8, 8 };
 	private Transform[,] anchors;
+
+	private bool justWon2048;
+	private bool hasWon2048;
 
 	private int currentScoreValue;
 	private int CurrentScore { get { return currentScoreValue; } set { currentScoreValue = value; ScoreLabel.text = string.Format("{0:n0}", currentScoreValue); } }
 
 	private void Start()
 	{
+		HideDirectionHighlights(false);
+
 		grid = new Grid2048(Size);
+
+		Win2048.SetActive(false);
 
 		if (!IsEditor) VersionLabel.text = Version;
 		//CurrentScore = 0;
@@ -121,6 +129,14 @@ public class Module2048Script : ModuleScript
 
 	private void Reset()
 	{
+		if (justWon2048)
+		{
+			justWon2048 = false;
+			Win2048.SetActive(false);
+			HideDirectionHighlights(false);
+			return;
+		}
+
 		grid.Cells = new DigTile[Size, Size];
 		CurrentScore = 0;
 		AddStartTiles();
@@ -156,6 +172,15 @@ public class Module2048Script : ModuleScript
 	private void OnDefocus()
 	{
 		isSelected = false;
+	}
+
+	private void HideDirectionHighlights(bool hide)
+	{
+		List<KMSelectable> children;
+		if (hide) children = new List<KMSelectable> { DirectionButtons[4] };
+		else children = new List<KMSelectable> { DirectionButtons[0], DirectionButtons[0], DirectionButtons[1], DirectionButtons[2], DirectionButtons[4], DirectionButtons[3] };
+		Get<KMSelectable>().Children = children.ToArray();
+		Get<KMSelectable>().UpdateChildren(hide ? DirectionButtons[4] : DirectionButtons[0]);
 	}
 
 	private void Update()
@@ -197,11 +222,11 @@ public class Module2048Script : ModuleScript
 		return new Coord(0, 1);
 	}
 
-	internal void MoveDirection(Direction direction, bool noLog = false)
+	internal void MoveDirection(Direction direction)
 	{
-		ButtonEffect(DirectionButtons[(int)direction], 0.5f, KMSoundOverride.SoundEffect.ButtonPress);
+		if (justWon2048 && !direction.Equals(Direction.Reset)) return;
 
-		if (IsSolved) return;
+		ButtonEffect(DirectionButtons[(int)direction], 0.5f, KMSoundOverride.SoundEffect.ButtonPress);
 
 		if (direction.Equals(Direction.Reset))
 		{
@@ -209,7 +234,7 @@ public class Module2048Script : ModuleScript
 			return;
 		}
 
-		Move(direction, noLog);
+		Move(direction);
 	}
 
 	private void CreateAnchors()
@@ -274,7 +299,7 @@ public class Module2048Script : ModuleScript
 		tile.UpdatePosition(cell);
 	}
 
-	private void Move(Direction direction, bool noLog)
+	private void Move(Direction direction)
 	{
 		Coord cell;
 		DigTile tile;
@@ -309,7 +334,13 @@ public class Module2048Script : ModuleScript
 
 						CurrentScore += merged.Value;
 
-						if (merged.Value == 2048) Solve();
+						if (merged.Value == Goal) Solve();
+						if (merged.Value == 2048 && !hasWon2048)
+						{
+							Win2048.SetActive(true);
+							hasWon2048 = justWon2048 = true;
+							HideDirectionHighlights(true);
+						}
 					}
 					else MoveTile(tile, positions.Farthest);
 
@@ -323,7 +354,7 @@ public class Module2048Script : ModuleScript
 			AddRandomTile();
 
 			Actuate();
-			if (!noLog) LogGrid(direction);
+			LogGrid(direction);
 
 			if (!MovesAvailable()) GameOver();
 		}
@@ -415,7 +446,7 @@ public class Module2048Script : ModuleScript
 		{
 			StartCoroutine(TileAddMerge(gameTile.transform));
 			foreach (DigTile merged in tile.MergedFrom) ActuateTile(merged);
-			gameTile.transform.localPosition += new Vector3(0f, 0.0002f, 0f);
+			gameTile.transform.localPosition += new Vector3(0f, 0.00015f, 0f);
 		}
 		else StartCoroutine(TileAddNew(gameTile.transform));
 
