@@ -2417,7 +2417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/DiffuseTint
+  - Unlit/Color
 --- !u!114 &114114336818119610
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2430,7 +2430,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/DiffuseTint
+  - Unlit/Color
 --- !u!114 &114140399508950130
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2510,7 +2510,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/DiffuseTint
+  - Unlit/Color
 --- !u!114 &114269129649406076
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2575,7 +2575,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/DiffuseTint
+  - Unlit/Color
 --- !u!114 &114427192286380942
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2637,7 +2637,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d461d5f418759c418916968212b7852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TwitchHelpMessage: '!{0} move up | !{0} move d | !{0} reset'
+  TwitchHelpMessage: '!{0} move up | !{0} move d | !{0} reset | IMPORTANT: You only
+    need to get to the 32 tile to solve the module.'
 --- !u!114 &114445355206332836
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2795,7 +2796,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/DiffuseTint
+  - Unlit/Color
 --- !u!114 &114719070478622420
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2844,7 +2845,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/DiffuseTint
+  - Unlit/Color
 --- !u!114 &114803216441893542
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2881,6 +2882,7 @@ MonoBehaviour:
   - {fileID: 114435727127596330}
   - {fileID: 114600323329779306}
   - {fileID: 114474633274151754}
+  VersionLabelBacking: {fileID: 23361473008079034}
   VersionLabel: {fileID: 102098038851258780}
   ScoreLabel: {fileID: 102156804375554748}
   Win2048: {fileID: 1929719202218902}
@@ -2896,7 +2898,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/DiffuseTint
+  - Unlit/Color
 --- !u!114 &114906159495589740
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2922,7 +2924,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/DiffuseTint
+  - Unlit/Color
 --- !u!114 &114977349888092076
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2948,7 +2950,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderNames:
-  - KT/Mobile/Diffuse
+  - KT/Mobile/DiffuseTint
 --- !u!114 &114982417452218412
 MonoBehaviour:
   m_ObjectHideFlags: 1

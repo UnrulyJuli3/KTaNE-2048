@@ -16,6 +16,7 @@ public class Module2048Script : ModuleScript
 	public GameObject BlankTile;
 	public GameTile TileObject;
 	public KMSelectable[] DirectionButtons;
+	public Renderer VersionLabelBacking;
 	public TextMesh VersionLabel;
 	public TextMesh ScoreLabel;
 	public GameObject Win2048;
@@ -41,19 +42,12 @@ public class Module2048Script : ModuleScript
 		Win2048.SetActive(false);
 
 		if (!IsEditor) VersionLabel.text = Version;
-		//CurrentScore = 0;
 
 		tileScale = TileObject.transform.localScale.x;
 		TileObject.gameObject.SetActive(false);
 		CreateAnchors();
 
-		//AddStartTiles();
-		//initialScore = CurrentScore;
-
 		Reset();
-
-		//Actuate();
-		//LogGrid(Direction.Reset);
 
 		for (int i = 0; i < DirectionButtons.Length; i++)
 		{
@@ -66,6 +60,17 @@ public class Module2048Script : ModuleScript
 		}
 
 		Get<KMSelectable>().Assign(onInteract: OnInteract, onDefocus: OnDefocus);
+	}
+
+	public override void OnActivate()
+	{
+		if (TwitchPlaysActive || Get<TP2048Script>().IsTwitchPlaysActive())
+		{
+			Goal = 32;
+			VersionLabel.text = "TP";
+			Color twitchColor;
+			if (ColorUtility.TryParseHtmlString("#9147ff", out twitchColor)) VersionLabelBacking.material.color = twitchColor;
+		}
 	}
 
 	private DigTile[,] lastLoggedGrid;
