@@ -15,7 +15,7 @@ MonoBehaviour:
   title: 2048
   author: TheDarkSid3r
   description: Combine tiles and get to 256 to win.
-  version: 1.4
+  version: 1.5
   outputFolder: D:\Program Files (x86)\Steam\steamapps\common\Keep Talking and Nobody
     Explodes\mods
   previewImage: {fileID: 2800000, guid: f2cfca3dbfbce24458176c5852aa9f99, type: 3}
