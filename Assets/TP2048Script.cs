@@ -5,10 +5,7 @@ using UnityEngine;
 
 public class TP2048Script : TPScript<Module2048Script>
 {
-	public bool IsTwitchPlaysActive()
-	{
-		return TwitchPlaysActive;
-	}
+	public bool TwitchPlaysActive;
 
 	private Module2048Script.Direction GetDirection(string phrase)
 	{

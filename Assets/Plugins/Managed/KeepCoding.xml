@@ -118,6 +118,16 @@
             </summary>
             <returns><see cref="T:UnityEngine.WaitWhile"/> until <see cref="P:KeepCoding.WorkBase.IsRunning"/> is no longer true.</returns>
         </member>
+        <member name="T:KeepCoding.TPScriptEditor">
+            <summary>
+            Custom inspector for <see cref="T:KeepCoding.TPScript`1"/>. Written by Emik.
+            </summary>
+        </member>
+        <member name="M:KeepCoding.TPScriptEditor.OnInspectorGUI">
+            <summary>
+            Creates the force solve button.
+            </summary>
+        </member>
         <member name="T:KeepCoding.ConstructorArgumentException">
             <summary>
             An exception thrown when the constructor throws an exception due to a bad argument. Written by Emik.
@@ -2091,6 +2101,20 @@
             <param name="isRecursive">Whether it should search inside the variable and yield return the elements inside <paramref name="source"/>.</param>
             <returns>An <see cref="T:System.Object"/> <see cref="T:System.Array"/> of all elements within <paramref name="source"/>.</returns>
         </member>
+        <member name="M:KeepCoding.Helper.GetUnsolvedModuleIDs(KMBombInfo)">
+            <summary>
+            Gives list of module names that are unsolved.
+            </summary>
+            <param name="bombInfo">The instance of <see cref="T:KMBombInfo"/> needed to get the modules.</param>
+            <returns>A list of unsolved module names.</returns>
+        </member>
+        <member name="M:KeepCoding.Helper.GetUnsolvedModuleNames(KMBombInfo)">
+            <summary>
+            Gives list of module names that are unsolved.
+            </summary>
+            <param name="bombInfo">The instance of <see cref="T:KMBombInfo"/> needed to get the modules.</param>
+            <returns>A list of unsolved modules.</returns>
+        </member>
         <member name="M:KeepCoding.Helper.Rev``1(System.Collections.Generic.List{``0})">
             <summary>
             Reverses a list and returns the new list.
@@ -3258,6 +3282,249 @@
             <param name="obj">The right-hand side operator.</param>
             <returns>Itself mod <paramref name="obj"/>.</returns>
         </member>
+        <member name="T:KeepCoding.ComponentPool">
+            <summary>
+            A ComponentPool is a collection of Module Types. The generator will pick Count times from this list and instantiate a component of the chosen type. Written by Emik.
+            </summary>
+        </member>
+        <member name="M:KeepCoding.ComponentPool.#ctor(System.Int32,KeepCoding.ComponentPool.ComponentSource,KeepCoding.ComponentPool.SpecialComponentTypeEnum,System.Collections.Generic.List{System.String},System.Collections.Generic.List{KeepCoding.ComponentPool.ComponentTypeEnum})">
+            <summary>
+            Creates a Component pool.
+            </summary>
+            <param name="count">How many components from this pool should be selected.</param>
+            <param name="allowedSources">Controls where components can come from (either the base game, mods, or both).</param>
+            <param name="specialComponentType">Special types which are calculated at runtime, such as <see cref="F:KeepCoding.ComponentPool.SpecialComponentTypeEnum.ALL_SOLVABLE"/>.</param>
+            <param name="modTypes">A list of mod types to be included in the pool, if they exist.</param>
+            <param name="componentTypes">The list of component types, not including any calculated at runtime special types, like ALL_SOLVABLE. Use GetComponentTypes to get the calculated list.</param>
+        </member>
+        <member name="T:KeepCoding.ComponentPool.ComponentSource">
+            <summary>
+            Controls where this pool will draw from (e.g. the base game modules, modules from mods, or both).
+            </summary>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentSource.Base">
+            <value>
+            Indicates that the module is from the base game.
+            </value>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentSource.Mods">
+            <value>
+            Indicates that the module is from mods.
+            </value>
+        </member>
+        <member name="T:KeepCoding.ComponentPool.SpecialComponentTypeEnum">
+            <summary>
+            Controls whether the modules will be chosen dynamically at runtime from whatever modules are loaded (based on the ComponentSource). Set to "None" to select specific module types.
+            </summary>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.SpecialComponentTypeEnum.None">
+            <value>
+            Indicates that the mission will choose a set of modules that are self-defined.
+            </value>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.SpecialComponentTypeEnum.ALL_SOLVABLE">
+            <value>
+            Indicates that the mission will randomly pull any of the game's loaded solvable modules.
+            </value>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.SpecialComponentTypeEnum.ALL_NEEDY">
+            <value>
+            Indicates that the mission will randomly pull any of the game's loaded needy modules.
+            </value>
+        </member>
+        <member name="T:KeepCoding.ComponentPool.ComponentTypeEnum">
+            <summary>
+            The module types in the base game.
+            </summary>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Empty">
+            <value>
+            No module. Uses the bomb backing.
+            </value>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Timer">
+            <value>
+            The timer component.
+            </value>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Wires">
+            <value>
+            On the Subject of Wires.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Wires.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.BigButton">
+            <value>
+            On the Subject of The Button.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/The%20Button.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Keypad">
+            <value>
+            On the Subject of Keypads.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Keypad.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Simon">
+            <value>
+            On the Subject of Simon Says. 
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Simon%20Says.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.WhosOnFirst">
+            <value>
+            On the Subject of Who's on First.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Who's%20On%20First.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Memory">
+            <value>
+            On the Subject of Memory.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Memory.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Morse">
+            <value>
+            On the Subject of Morse Code.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Morse%20Code.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Venn">
+            <value>
+            On the Subject of Complicated Wires.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Complicated%20Wires.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.WireSequence">
+            <value>
+            On the Subject of Wire Sequences.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Wire%20Sequence.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Maze">
+            <value>
+            On the Subject of Mazes.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Maze.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.Password">
+            <value>
+            On the Subject of Passwords.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Password.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.NeedyVentGas">
+            <value>
+            On the Subject of Venting Gas.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Venting%20Gas.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.NeedyCapacitor">
+            <value>
+            On the Subject of Capacitor Discharge.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Capacitor%20Discharge.html"/></remarks>
+        </member>
+        <member name="F:KeepCoding.ComponentPool.ComponentTypeEnum.NeedyKnob">
+            <value>
+            On the Subject of Knobs.
+            </value>
+            <remarks><seealso href="https://ktane.timwi.de/HTML/Knob.html"/></remarks>
+        </member>
+        <member name="P:KeepCoding.ComponentPool.Count">
+            <value>
+            How many components from this pool should be selected.
+            </value>
+        </member>
+        <member name="P:KeepCoding.ComponentPool.AllowedSources">
+            <value>
+            Controls where components can come from (either the base game, mods, or both).
+            </value>
+        </member>
+        <member name="P:KeepCoding.ComponentPool.SpecialComponentType">
+            <value>
+            Special types which are calculated at runtime, such as <see cref="F:KeepCoding.ComponentPool.SpecialComponentTypeEnum.ALL_SOLVABLE"/>.
+            </value>
+        </member>
+        <member name="P:KeepCoding.ComponentPool.ModTypes">
+            <value>
+            A list of mod types to be included in the pool, if they exist.
+            </value>
+        </member>
+        <member name="P:KeepCoding.ComponentPool.ComponentTypes">
+            <value>
+            The list of component types, not including any calculated at runtime special types, like ALL_SOLVABLE. Use GetComponentTypes to get the calculated list.
+            </value>
+        </member>
+        <member name="M:KeepCoding.ComponentPool.ToString">
+            <summary>
+            Converts itself to a string.
+            </summary>
+            <returns>The list of mod types with a count at the end.</returns>
+        </member>
+        <member name="T:KeepCoding.GeneratorSetting">
+            <summary>
+            Everything needed to generate a single bomb. Written by Emik.
+            </summary>
+        </member>
+        <member name="M:KeepCoding.GeneratorSetting.#ctor(System.Boolean,System.Int32,System.Int32,System.Int32,System.Single,System.Collections.Generic.List{KeepCoding.ComponentPool})">
+            <summary>
+            Creates a generator setting based on the provided parameters.
+            </summary>
+            <param name="frontFaceOnly">Force modules to be placed only on the front face. By default this will limit the module count to 5 (+1 for the timer). Useful in rare circumstances where you wish to generate a bomb with a few modules and guarantee that they will all be visibile simultaneously.</param>
+            <param name="optionalWidgetCount">Set how many optional widgets (widgets other than serial number) that should be placed on the bomb.</param>
+            <param name="numStrikes">The number of strikes at which the bomb explodes. Hardcore is 1. More forgiving is 3.</param>
+            <param name="timeBeforeNeedyActivation">Time, in seconds, which must elapse before any unactivated Needy modules are automatically activated.</param>
+            <param name="timeLimit">Initial value for the timer when the bomb is activated, in seconds.</param>
+            <param name="componentPools">The pools of modules that will be used when generating a bomb.</param>
+        </member>
+        <member name="M:KeepCoding.GeneratorSetting.#ctor">
+            <summary>
+            Creates a generator setting with the default parameters.
+            </summary>
+        </member>
+        <member name="P:KeepCoding.GeneratorSetting.FrontFaceOnly">
+            <value>
+            Force modules to be placed only on the front face. By default this will limit the module count to 5 (+1 for the timer). Useful in rare circumstances where you wish to generate a bomb with a few modules and guarantee that they will all be visibile simultaneously.
+            </value>
+        </member>
+        <member name="P:KeepCoding.GeneratorSetting.OptionalWidgetCount">
+            <value>
+            Set how many optional widgets (widgets other than serial number) that should be placed on the bomb.
+            </value>
+        </member>
+        <member name="P:KeepCoding.GeneratorSetting.NumStrikes">
+            <value>
+            The number of strikes at which the bomb explodes. Hardcore is 1. More forgiving is 3.
+            </value>
+        </member>
+        <member name="P:KeepCoding.GeneratorSetting.TimeBeforeNeedyActivation">
+            <value>
+            Time, in seconds, which must elapse before any unactivated Needy modules are automatically activated.
+            </value>
+        </member>
+        <member name="P:KeepCoding.GeneratorSetting.TimeLimit">
+            <value>
+            Initial value for the timer when the bomb is activated, in seconds.
+            </value>
+        </member>
+        <member name="P:KeepCoding.GeneratorSetting.ComponentPools">
+            <value>
+            The pools of modules that will be used when generating a bomb.
+            </value>
+        </member>
+        <member name="M:KeepCoding.GeneratorSetting.GetComponentCount">
+            <summary>
+            The total count of modules that will be added according to the component pools.
+            </summary>
+            <returns>The amount of components.</returns>
+        </member>
+        <member name="M:KeepCoding.GeneratorSetting.ToString">
+            <summary>
+            Converts itself to a string.
+            </summary>
+            <returns>Time, number of strikes, and the pools converted to a string.</returns>
+        </member>
         <member name="T:KeepCoding.ModInfo">
             <summary>
             Contains information about the mod's info, this class can be used to deserialize every mod's "modInfo.json".
@@ -3318,15 +3585,15 @@
         </member>
         <member name="T:KeepCoding.ModuleContainer">
             <summary>
-            Container for both regular and needy modules. Written by Emik.
+            Container for both solvable and needy modules. Written by Emik.
             </summary>
         </member>
         <member name="M:KeepCoding.ModuleContainer.#ctor(KMBombModule,KMNeedyModule)">
             <summary>
-            Encapsulates either a regular or needy module.
+            Encapsulates either a solvable or needy module.
             </summary>
             <exception cref="T:KeepCoding.ConstructorArgumentException"></exception>
-            <param name="regular">The instance of a normal module.</param>
+            <param name="solvable">The instance of a normal module.</param>
             <param name="needy">The instance of a needy module.</param>
         </member>
         <member name="P:KeepCoding.ModuleContainer.RequiresTimerVisibility">
@@ -3365,7 +3632,7 @@
             </value>
             <exception cref="T:KeepCoding.UnrecognizedTypeException"></exception>
         </member>
-        <member name="P:KeepCoding.ModuleContainer.Regular">
+        <member name="P:KeepCoding.ModuleContainer.Solvable">
             <value>
             Returns <see cref="T:KMBombModule"/>, or if null, throws a <see cref="T:System.NullReferenceException"/>.
             </value>
@@ -3384,10 +3651,10 @@
         </member>
         <member name="M:KeepCoding.ModuleContainer.op_Implicit(KMBombModule)~KeepCoding.ModuleContainer">
             <summary>
-            Creates a new instance of <see cref="T:KeepCoding.ModuleContainer"/> where <see cref="P:KeepCoding.ModuleContainer.Regular"/> is defined.
+            Creates a new instance of <see cref="T:KeepCoding.ModuleContainer"/> where <see cref="P:KeepCoding.ModuleContainer.Solvable"/> is defined.
             </summary>
-            <param name="regular">The regular module to create a new <see cref="T:KeepCoding.ModuleContainer"/> of.</param>
-            <returns>A <see cref="T:KeepCoding.ModuleContainer"/> with parameter <paramref name="regular"/>.</returns>
+            <param name="solvable">The solvable module to create a new <see cref="T:KeepCoding.ModuleContainer"/> of.</param>
+            <returns>A <see cref="T:KeepCoding.ModuleContainer"/> with parameter <paramref name="solvable"/>.</returns>
         </member>
         <member name="M:KeepCoding.ModuleContainer.op_Implicit(KMNeedyModule)~KeepCoding.ModuleContainer">
             <summary>
@@ -3398,10 +3665,10 @@
         </member>
         <member name="M:KeepCoding.ModuleContainer.op_Explicit(KeepCoding.ModuleContainer)~KMBombModule">
             <summary>
-            Returns the instance of <see cref="T:KMBombModule"/> from <see cref="P:KeepCoding.ModuleContainer.Regular"/>.
+            Returns the instance of <see cref="T:KMBombModule"/> from <see cref="P:KeepCoding.ModuleContainer.Solvable"/>.
             </summary>
             <param name="container">The <see cref="T:KeepCoding.ModuleContainer"/> to get the <see cref="T:KMBombModule"/> from.</param>
-            <returns>A <see cref="T:KMBombModule"/> from <see cref="P:KeepCoding.ModuleContainer.Regular"/>.</returns>
+            <returns>A <see cref="T:KMBombModule"/> from <see cref="P:KeepCoding.ModuleContainer.Solvable"/>.</returns>
         </member>
         <member name="M:KeepCoding.ModuleContainer.op_Explicit(KeepCoding.ModuleContainer)~KMNeedyModule">
             <summary>
@@ -3448,23 +3715,26 @@
             <param name="enumerator">The enumerator to call when initiated.</param>
             <param name="monoBehaviour">The MonoBehaviour to reference when calling the method.</param>
         </member>
-        <member name="M:KeepCoding.Routine.Start(System.Boolean)">
+        <member name="M:KeepCoding.Routine.Start(System.Boolean,System.Boolean)">
             <summary>
-            Starts the coroutine. Unless specified by <paramref name="allowSimultaneousRuns"/>, it will not be called if this class is in the middle of running the coroutine.
+            Starts the coroutine. Unless specified by <paramref name="allowMultiple"/>, it will not be called if this class is in the middle of running the coroutine.
             </summary>
-            <param name="allowSimultaneousRuns">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="allowMultiple">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine.Restart">
+        <member name="M:KeepCoding.Routine.Restart(System.Boolean)">
             <summary>
             Stops and restarts the first coroutine that was run.
             </summary>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine.RestartAll">
+        <member name="M:KeepCoding.Routine.RestartAll(System.Boolean)">
             <summary>
             Restarts all coroutines currently running.
             </summary>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
         <member name="T:KeepCoding.Routine`1">
             <summary>
@@ -3478,26 +3748,29 @@
             <param name="enumerator">The enumerator to call when initiated.</param>
             <param name="monoBehaviour">The MonoBehaviour to reference when calling the method.</param>
         </member>
-        <member name="M:KeepCoding.Routine`1.Start(`0,System.Boolean)">
+        <member name="M:KeepCoding.Routine`1.Start(`0,System.Boolean,System.Boolean)">
             <summary>
-            Starts the coroutine. Unless specified by <paramref name="allowSimultaneousRuns"/>, it will not be called if this class is in the middle of running the coroutine.
+            Starts the coroutine. Unless specified by <paramref name="allowMultiple"/>, it will not be called if this class is in the middle of running the coroutine.
             </summary>
             <param name="t">The first argument to pass into the coroutine.</param>
-            <param name="allowSimultaneousRuns">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="allowMultiple">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine`1.Restart(`0)">
+        <member name="M:KeepCoding.Routine`1.Restart(`0,System.Boolean)">
             <summary>
             Stops and restarts the first coroutine that was run.
             </summary>
             <param name="t">The first argument to pass into the coroutine.</param>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine`1.RestartAll(`0)">
+        <member name="M:KeepCoding.Routine`1.RestartAll(`0,System.Boolean)">
             <summary>
             Restarts all coroutines currently running.
             </summary>
             <param name="t">The first argument to pass into the coroutine.</param>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
         <member name="T:KeepCoding.Routine`2">
             <summary>
@@ -3511,29 +3784,32 @@
             <param name="enumerator">The enumerator to call when initiated.</param>
             <param name="monoBehaviour">The MonoBehaviour to reference when calling the method.</param>
         </member>
-        <member name="M:KeepCoding.Routine`2.Start(`0,`1,System.Boolean)">
+        <member name="M:KeepCoding.Routine`2.Start(`0,`1,System.Boolean,System.Boolean)">
             <summary>
-            Starts the coroutine. Unless specified by <paramref name="allowSimultaneousRuns"/>, it will not be called if this class is in the middle of running the coroutine.
+            Starts the coroutine. Unless specified by <paramref name="allowMultiple"/>, it will not be called if this class is in the middle of running the coroutine.
             </summary>
             <param name="t1">The first argument to pass into the coroutine.</param>
             <param name="t2">The second argument to pass into the coroutine.</param>
-            <param name="allowSimultaneousRuns">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="allowMultiple">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine`2.Restart(`0,`1)">
+        <member name="M:KeepCoding.Routine`2.Restart(`0,`1,System.Boolean)">
             <summary>
             Stops and restarts the first coroutine that was run.
             </summary>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
             <param name="t1">The first argument to pass into the coroutine.</param>
             <param name="t2">The second argument to pass into the coroutine.</param>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine`2.RestartAll(`0,`1)">
+        <member name="M:KeepCoding.Routine`2.RestartAll(`0,`1,System.Boolean)">
             <summary>
             Restarts all coroutines currently running.
             </summary>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
             <param name="t1">The first argument to pass into the coroutine.</param>
             <param name="t2">The second argument to pass into the coroutine.</param>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
         <member name="T:KeepCoding.Routine`3">
             <summary>
@@ -3547,16 +3823,17 @@
             <param name="enumerator">The enumerator to call when initiated.</param>
             <param name="monoBehaviour">The MonoBehaviour to reference when calling the method.</param>
         </member>
-        <member name="M:KeepCoding.Routine`3.Start(`0,`1,`2,System.Boolean)">
+        <member name="M:KeepCoding.Routine`3.Start(`0,`1,`2,System.Boolean,System.Boolean)">
             <summary>
-            Starts the coroutine. Unless specified by <paramref name="allowSimultaneousRuns"/>, it will not be called if this class is in the middle of running the coroutine.
+            Starts the coroutine. Unless specified by <paramref name="allowMultiple"/>, it will not be called if this class is in the middle of running the coroutine.
             </summary>
             <param name="t1">The first argument to pass into the coroutine.</param>
             <param name="t2">The second argument to pass into the coroutine.</param>
             <param name="t3">The third argument to pass into the coroutine.</param>
-            <param name="allowSimultaneousRuns">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="allowMultiple">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine`3.Restart(`0,`1,`2)">
+        <member name="M:KeepCoding.Routine`3.Restart(`0,`1,`2,System.Boolean)">
             <summary>
             Stops and restarts the first coroutine that was run.
             </summary>
@@ -3564,8 +3841,9 @@
             <param name="t2">The second argument to pass into the coroutine.</param>
             <param name="t3">The third argument to pass into the coroutine.</param>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine`3.RestartAll(`0,`1,`2)">
+        <member name="M:KeepCoding.Routine`3.RestartAll(`0,`1,`2,System.Boolean)">
             <summary>
             Restarts all coroutines currently running.
             </summary>
@@ -3573,6 +3851,7 @@
             <param name="t2">The second argument to pass into the coroutine.</param>
             <param name="t3">The third argument to pass into the coroutine.</param>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
         <member name="T:KeepCoding.Routine`4">
             <summary>
@@ -3586,17 +3865,18 @@
             <param name="enumerator">The enumerator to call when initiated.</param>
             <param name="monoBehaviour">The MonoBehaviour to reference when calling the method.</param>
         </member>
-        <member name="M:KeepCoding.Routine`4.Start(`0,`1,`2,`3,System.Boolean)">
+        <member name="M:KeepCoding.Routine`4.Start(`0,`1,`2,`3,System.Boolean,System.Boolean)">
             <summary>
-            Starts the coroutine. Unless specified by <paramref name="allowSimultaneousRuns"/>, it will not be called if this class is in the middle of running the coroutine.
+            Starts the coroutine. Unless specified by <paramref name="allowMultiple"/>, it will not be called if this class is in the middle of running the coroutine.
             </summary>
             <param name="t1">The first argument to pass into the coroutine.</param>
             <param name="t2">The second argument to pass into the coroutine.</param>
             <param name="t3">The third argument to pass into the coroutine.</param>
             <param name="t4">The fourth argument to pass into the coroutine.</param>
-            <param name="allowSimultaneousRuns">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="allowMultiple">Determines whether it should be allowed to create another instance of the coroutine even if it's running another one.</param>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine`4.Restart(`0,`1,`2,`3)">
+        <member name="M:KeepCoding.Routine`4.Restart(`0,`1,`2,`3,System.Boolean)">
             <summary>
             Stops and restarts the first coroutine that was run.
             </summary>
@@ -3605,8 +3885,9 @@
             <param name="t3">The third argument to pass into the coroutine.</param>
             <param name="t4">The fourth argument to pass into the coroutine.</param>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
-        <member name="M:KeepCoding.Routine`4.RestartAll(`0,`1,`2,`3)">
+        <member name="M:KeepCoding.Routine`4.RestartAll(`0,`1,`2,`3,System.Boolean)">
             <summary>
             Restarts all coroutines currently running.
             </summary>
@@ -3615,6 +3896,7 @@
             <param name="t3">The third argument to pass into the coroutine.</param>
             <param name="t4">The fourth argument to pass into the coroutine.</param>
             <exception cref="T:KeepCoding.EmptyIteratorException"></exception>
+            <param name="oneByOne">If called multiple times, waits until the others are finished.</param>
         </member>
         <member name="T:KeepCoding.Sound">
             <summary>
@@ -4210,42 +4492,60 @@
             </summary>
             <returns><see cref="T:UnityEngine.WaitWhile"/> in various places until the thread has been finished.</returns>
         </member>
-        <member name="T:KeepCoding.IModule">
-            <summary>
-            Interface for regular and needy modded modules. Written by Emik.
-            </summary>
-        </member>
-        <member name="P:KeepCoding.IModule.IsLastInstantiated">
-            <value>
-            Determines whether this module is the last instantiated instance.
-            </value>
-        </member>
-        <member name="P:KeepCoding.IModule.Version">
-            <value>
-            The version number of the entire mod.
-            </value>
-        </member>
-        <member name="M:KeepCoding.IModule.OnActivate">
-            <summary>
-            Called when the lights turn on.
-            </summary>
-        </member>
-        <member name="M:KeepCoding.IModule.OnTimerTick">
-            <summary>
-            Called when the timer's seconds-digit changes.
-            </summary>
-        </member>
-        <member name="T:KeepCoding.ITP`1">
+        <member name="T:KeepCoding.ITP">
             <summary>
             Interface for Twitch Plays support. Written by Emik.
             </summary>
         </member>
-        <member name="P:KeepCoding.ITP`1.Module">
+        <member name="P:KeepCoding.ITP.IsTimeSkippable">
             <value>
-            The instance of the module.
+            Determines if it should allow for the timer to be skipped when the module it is in, as well as any other modules that would like to skip time, are the only unsolved modules left on the bomb. 
             </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
         </member>
-        <member name="M:KeepCoding.ITP`1.ProcessTwitchCommand(System.String)">
+        <member name="P:KeepCoding.ITP.IsCancelCommand">
+            <value>
+            Determines if it should cancel command processing. If this returns true, then stop processing the command, clean up, then do a <c>yield return Cancelled;</c> to acknowledge the cancel.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
+        </member>
+        <member name="P:KeepCoding.ITP.IsTimeMode">
+            <value>
+            Determines if it is in Time Mode, where solves change the timer. This is useful for modules that use the timer's value.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
+        </member>
+        <member name="P:KeepCoding.ITP.IsTP">
+            <value>
+            Determines if Twitch Plays is currently active. This is for modules that need to display different items, or use different rules if Twitch Plays is active.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
+        </member>
+        <member name="P:KeepCoding.ITP.IsZenMode">
+            <value>
+            Determines if the timer is counting up instead of down, for special cases, such as controlling how to sort button release times, or whether there is a low timer event or not.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
+        </member>
+        <member name="P:KeepCoding.ITP.AbandonModule">
+            <value>
+            Declaring this field allows for Twitch Plays to inform the module that the bomb is in Time Mode, where solves change the timer. This is useful for modules that use the timer's value.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
+        </member>
+        <member name="M:KeepCoding.ITP.ProcessTwitchCommand(System.String)">
             <summary>
             When a command is typed into Twitch Plays with the Id of this module, it calls this method and passes in the exact command typed.
             </summary>
@@ -4255,7 +4555,7 @@
             <param name="command">The user's command.</param>
             <returns>A series of instructions for the Twitch Plays mod to handle as requested by the user.</returns>
         </member>
-        <member name="M:KeepCoding.ITP`1.TwitchHandleForcedSolve">
+        <member name="M:KeepCoding.ITP.TwitchHandleForcedSolve">
             <summary>
             When the module runs into an exception or the module is forced to be solved, it calls this method.
             </summary>
@@ -4268,6 +4568,31 @@
             <summary>
             Interface for tuple type. Written by Emik.
             </summary>
+        </member>
+        <member name="P:KeepCoding.ITuple.Item(System.Byte)">
+            <summary>
+            Indexable tuple. Be careful when using this as the compiler will not notice if you are using the wrong type.
+            </summary>
+            <exception cref="T:System.IndexOutOfRangeException"></exception>
+            <exception cref="T:KeepCoding.WrongDatatypeException"></exception>
+            <param name="i">The index to use.</param>
+            <returns>The item indexed into.</returns>
+        </member>
+        <member name="P:KeepCoding.ITuple.IsEmpty">
+            <value>
+            Determines if the tuple data type is empty.
+            </value>
+        </member>
+        <member name="P:KeepCoding.ITuple.Length">
+            <value>
+            Gets the length of the tuple, describing the amount of elements there are.
+            </value>
+        </member>
+        <member name="P:KeepCoding.ITuple.UpperBound">
+            <value>
+            Gets the upper bound of the tuple, which is the last index.
+            </value>
+            <exception cref="T:System.InvalidOperationException"></exception>
         </member>
         <member name="P:KeepCoding.ITuple.ToArray">
             <value>
@@ -4361,9 +4686,19 @@
             Unpauses the paused playback of this <see cref="T:UnityEngine.AudioSource"/>.
             </summary>
         </member>
+        <member name="T:KeepCoding.ModBundle">
+            <summary>
+            Mod bundle component. This is used to get information about the module at runtime, as this cannot be determined elsewhere. Written by Emik.
+            </summary>
+        </member>
+        <member name="F:KeepCoding.ModBundle.Name">
+            <summary>
+            The name of the bundle. This is required for the version number.
+            </summary>
+        </member>
         <member name="T:KeepCoding.ModuleScript">
             <summary>
-            Base class for regular and needy modded modules in Keep Talking and Nobody Explodes. Written by Emik.
+            Base class for solvable and needy modded modules in Keep Talking and Nobody Explodes. Written by Emik.
             </summary>
         </member>
         <member name="P:KeepCoding.ModuleScript.HasStruck">
@@ -4397,9 +4732,9 @@
             </value>
         </member>
         <member name="P:KeepCoding.ModuleScript.IsVR">
-            <summary>
+            <value>
             Determines whether the game is being played in Virtual Reality.
-            </summary>
+            </value>
         </member>
         <member name="P:KeepCoding.ModuleScript.ModuleId">
             <value>
@@ -4411,52 +4746,30 @@
             The amount of time left on the bomb, in seconds, rounded down.
             </value>
         </member>
-        <member name="F:KeepCoding.ModuleScript.ModBundleName">
-            <summary>
-            The name of the bundle. This is required for the version number.
-            </summary>
-        </member>
         <member name="P:KeepCoding.ModuleScript.Version">
             <value>
-            The version number of the entire mod. Requires instance of <see cref="F:KeepCoding.ModuleScript.ModBundleName"/>.
+            The version number of the entire mod. Requires <see cref="F:KeepCoding.ModBundle.Name"/> to be set.
             </value>
             <exception cref="T:System.OperationCanceledException"></exception>
             <exception cref="T:System.IO.FileNotFoundException"></exception>
         </member>
         <member name="P:KeepCoding.ModuleScript.Sounds">
             <value>
-            Contains an instance for every sound played by this module using <see cref="M:KeepCoding.ModuleScript.PlaySound(UnityEngine.Transform,System.Boolean,KeepCoding.Sound[])"/> or any of its overloads.
+            Contains an instance for every <see cref="T:KeepCoding.Sound"/> played by this module using <see cref="M:KeepCoding.ModuleScript.PlaySound(UnityEngine.Transform,System.Boolean,KeepCoding.Sound[])"/> or any of its overloads.
             </value>
         </member>
         <member name="P:KeepCoding.ModuleScript.Module">
-            <summary>
+            <value>
             Contains either <see cref="T:KMBombModule"/> or <see cref="T:KMNeedyModule"/>, and allows for running commands through context.
-            </summary>
+            </value>
         </member>
-        <member name="F:KeepCoding.ModuleScript.TimeModeActive">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
-        </member>
-        <member name="F:KeepCoding.ModuleScript.TwitchPlaysActive">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
-        </member>
-        <member name="F:KeepCoding.ModuleScript.TwitchPlaysSkipTimeAllowed">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
-        </member>
-        <member name="F:KeepCoding.ModuleScript.TwitchShouldCancelCommand">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
-        </member>
-        <member name="F:KeepCoding.ModuleScript.ZenModeActive">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
+        <member name="P:KeepCoding.ModuleScript.TP">
+            <value>
+            Gets the Twitch Plays <see cref="T:UnityEngine.Component"/> attached to this <see cref="T:UnityEngine.GameObject"/>.
+            </value>
+            <remarks>
+            Due to type ambiguity, a non-generic interface is returned.
+            </remarks>
         </member>
         <member name="M:KeepCoding.ModuleScript.Awake">
             <summary>
@@ -4544,6 +4857,24 @@
             <summary>
             Called when the timer's seconds-digit changes.
             </summary>
+        </member>
+        <member name="M:KeepCoding.ModuleScript.OnModuleStrike(System.String)">
+            <summary>
+            Called when any module on the current bomb has issued a strike.
+            </summary>
+            <param name="moduleId">The sender's module id, which caused a strike.</param>
+        </member>
+        <member name="M:KeepCoding.ModuleScript.OnNeedySolved(System.String)">
+            <summary>
+            Called when any <see cref="T:KMNeedyModule"/> on the current bomb has been solved.
+            </summary>
+            <param name="moduleId">The sender's module id, which was solved.</param>
+        </member>
+        <member name="M:KeepCoding.ModuleScript.OnSolvableSolved(System.String)">
+            <summary>
+            Called when any <see cref="T:KMBombModule"/> on the current bomb has been solved.
+            </summary>
+            <param name="moduleId">The sender's module id, which was solved.</param>
         </member>
         <member name="M:KeepCoding.ModuleScript.Write``1(System.String,``0)">
             <summary>
@@ -4649,7 +4980,7 @@
         </member>
         <member name="T:KeepCoding.TPScript`1">
             <summary>
-            Base class for TwitchPlays support for regular and needy modded modules in Keep Talking and Nobody Explodes. Written by Emik.
+            Base class for TwitchPlays support for solvable and needy modded modules in Keep Talking and Nobody Explodes. Written by Emik.
             </summary>
         </member>
         <member name="F:KeepCoding.TPScript`1.TwitchHelpMessage">
@@ -4657,35 +4988,53 @@
             The help message that gets sent when typing <c>!{0} help</c>.
             </summary>
         </member>
-        <member name="F:KeepCoding.TPScript`1.TimeModeActive">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
+        <member name="P:KeepCoding.TPScript`1.IsTimeSkippable">
+            <value>
+            Determines if it should allow for the timer to be skipped when the module it is in, as well as any other modules that would like to skip time, are the only unsolved modules left on the bomb. 
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
         </member>
-        <member name="F:KeepCoding.TPScript`1.TwitchPlaysActive">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
+        <member name="P:KeepCoding.TPScript`1.IsCancelCommand">
+            <value>
+            Determines if it should cancel command processing. If this returns true, then stop processing the command, clean up, then do a <c>yield return Cancelled;</c> to acknowledge the cancel.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
         </member>
-        <member name="F:KeepCoding.TPScript`1.TwitchPlaysSkipTimeAllowed">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
+        <member name="P:KeepCoding.TPScript`1.IsTimeMode">
+            <value>
+            Determines if it is in Time Mode, where solves change the timer. This is useful for modules that use the timer's value.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
         </member>
-        <member name="F:KeepCoding.TPScript`1.TwitchShouldCancelCommand">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
+        <member name="P:KeepCoding.TPScript`1.IsTP">
+            <value>
+            Determines if Twitch Plays is currently active. This is for modules that need to display different items, or use different rules if Twitch Plays is active.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
         </member>
-        <member name="F:KeepCoding.TPScript`1.ZenModeActive">
-            <summary>
-            These values are set by the Twitch Plays mod using reflection.
-            </summary>
+        <member name="P:KeepCoding.TPScript`1.IsZenMode">
+            <value>
+            Determines if the timer is counting up instead of down, for special cases, such as controlling how to sort button release times, or whether there is a low timer event or not.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
         </member>
-        <member name="F:KeepCoding.TPScript`1.TwitchAbandonModule">
-            <summary>
-            Declaring this field allows for Twitch Plays to inform the module that the bomb is in Time Mode, where solves change the timer. This is useful for modules that use the timer's value. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, therefore the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
-            </summary>
+        <member name="P:KeepCoding.TPScript`1.AbandonModule">
+            <value>
+            This list contains modules that it should stop processing. Currently, the only module that uses this capability is Souvenir.
+            </value>
+            <remarks>
+            These values are set by the Twitch Plays mod using reflection. This field is set in <c>Start()</c>, therefore there's no guarantee that it'll be available there, the field must be first accessed in a delegate in <see cref="F:KMBombModule.OnActivate"/> or <see cref="F:KMNeedyModule.OnActivate"/> or later.
+            </remarks>
         </member>
         <member name="P:KeepCoding.TPScript`1.Module">
             <value>
@@ -4693,69 +5042,69 @@
             </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.Strike">
-            <summary>
+            <value>
             Yield return this to indicate that this command will cause a strike at some later point; all this does is tell Twitch Plays to attribute the strike to the author of this command.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.Solve">
-            <summary>
+            <value>
             Yield return this to indicate that this command will solve the module at some later point; all this does is tell Twitch Plays to attribute the solve to the author of this command.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.UnsubmittablePenalty">
-            <summary>
+            <value>
             Yield return this to indicate that the command couldn't submit an answer and should only be used to prevent users from guessing the answer. This should not be used if an answer could never be submittable for a module.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.TryCancelSequence">
-            <summary>
+            <value>
             Yield return this to indicate that the <c>KMSelectable[]</c> sequence that follows this command should be cancelled if a "!cancel" or "!stop" is issued mid-way through that sequence.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.Cancelled">
-            <summary>
+            <value>
             Yield return this to indicate that you have stopped processing the command in response to the <see cref="F:KeepCoding.TPScript`1.TwitchShouldCancelCommand"/> bool being set to true.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.MultipleStrikes">
-            <summary>
+            <value>
             Yield return this to indicate that the issued command is going to cause more than one strike, so should disable the internal strike tracker in order to avoid flooding the chat with "VoteNay Module {id} got a strike! +1 strike to {Nickname}" for as many strikes as will be awarded. This also disables the internal solve tracker as well. This allows for sending additional messages or continue processing commands regardless of the solve/strike state.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.EndMultipleStrikes">
-            <summary>
+            <value>
             Yield return this to indicate that the strike tracker should be enabled. If any strikes were issued during the time it was disabled, they will be awarded and the routine stopped at that point, otherwise, it will just cancel the "VoteNay Module {id} got 0 strikes! +0 strike to {Nickname}" message that would otherwise be posted. Likewise, if the module was solved at the time this command is issued, the processing will be stopped as of that point as well.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.AutoSolve">
-            <summary>
+            <value>
             Yield return this to indicate automatically solving the module, as if it threw an exception while solving.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.CancelDetonate">
-            <summary>
+            <value>
             Yield return this to indicate cancelling a previously issued delayed detonation command on the same module.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.WaitingMusic">
-            <summary>
+            <value>
             Yield return this to indicate playing the waiting music if a command will take long to finish.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.EndWaitingMusic">
-            <summary>
+            <value>
             Yield return this to indicate stopping the waiting music mid-command.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.ToggleWaitingMusic">
-            <summary>
+            <value>
             Yield return this to toggle the waiting music on and off mid-command.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.TPScript`1.HideCamera">
-            <summary>
+            <value>
             Yield return this to hide the heads-up display and cameras while doing quaternion rotations, if it is expected that the camera/hud will get in the way.
-            </summary>
+            </value>
         </member>
         <member name="M:KeepCoding.TPScript`1.ProcessTwitchCommand(System.String)">
             <summary>
@@ -4841,7 +5190,7 @@
         </member>
         <member name="M:KeepCoding.TPScript`1.SkipTime(System.String)">
             <summary>
-            Yield return this to try advancing the clock to the specified time. You must put the full time you wish to skip to, and this time either needs to be less than the current time, if in normal/time mode, or greater than the current time, if in zen mode. Example, if you wanted to set the clock to 5:24, then you do "skiptime 324" or "skiptime 5:24". You can target partway through the seconds, such as "skiptime 45.28", which would then set the clock to 45.28, provided that time has NOT gone by already. You must also declare the <see cref="F:KeepCoding.TPScript`1.TwitchPlaysSkipTimeAllowed"/> bool, and set it to true, for this function to work.
+            Yield return this to try advancing the clock to the specified time. You must put the full time you wish to skip to, and this time either needs to be less than the current time, if in normal/time mode, or greater than the current time, if in zen mode. Example, if you wanted to set the clock to 5:24, then you do "skiptime 324" or "skiptime 5:24". You can target partway through the seconds, such as "skiptime 45.28", which would then set the clock to 45.28, provided that time has NOT gone by already. You must also set <see cref="P:KeepCoding.TPScript`1.IsTimeSkippable"/> to true, for this function to work.
             </summary>
             <param name="seconds">The time to skip to in seconds.</param>
             <returns>A formatted string for Twitch Plays.</returns>
@@ -4896,34 +5245,34 @@
             </summary>
         </member>
         <member name="F:KeepCoding.Game.ControlType.Gamepad">
-            <summary>
+            <value>
             The game is being controlled with a gamepad controller.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.Game.ControlType.Gaze">
-            <summary>
+            <value>
             The game is being controlled with a virtual reality headset.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.Game.ControlType.Mouse">
-            <summary>
+            <value>
             The game is being controlled with a mouse.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.Game.ControlType.Motion">
-            <summary>
+            <value>
             The game is being controlled with virtual reality headset and controller.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.Game.ControlType.Touch">
-            <summary>
+            <value>
             The game is being controlled with touch controls.
-            </summary>
+            </value>
         </member>
         <member name="F:KeepCoding.Game.ControlType.ThreeDOF">
-            <summary>
+            <value>
             The game is being controlled with three degrees of freedom, part of virtual reality.
-            </summary>
+            </value>
         </member>
         <member name="T:KeepCoding.Game.ModSourceEnum">
             <summary>
@@ -4945,20 +5294,73 @@
             The mod is stored within the workshop folder.
             </value>
         </member>
+        <member name="T:KeepCoding.Game.IRCConnection">
+            <summary>
+            Allows access into Twitch Plays messaging system.
+            </summary>
+        </member>
+        <member name="P:KeepCoding.Game.IRCConnection.SendMessage">
+            <value>
+            Sends a message to the chat.
+            </value>
+            <remarks>Arguments: <c>message</c>.</remarks>
+        </member>
+        <member name="P:KeepCoding.Game.IRCConnection.SendMessageFormat">
+            <value>
+            Sends a message to the chat.
+            </value>
+            <remarks>Arguments: <c>message</c> and <c>args</c>.</remarks>
+        </member>
+        <member name="P:KeepCoding.Game.IRCConnection.SendWhisper">
+            <value>
+            Whispers a message to a person.
+            </value>
+            <remarks>Arguments: <c>userNickName</c>, <c>message</c>, and <c>args</c>.</remarks>
+        </member>
         <member name="T:KeepCoding.Game.KTInputManager">
             <summary>
             Allows access relating to how the game is being interacted with.
             </summary>
         </member>
         <member name="P:KeepCoding.Game.KTInputManager.IsCurrentControlTypeVR">
-            <summary>
+            <value>
             Determines if the current way the game is being controlled is VR-related.
-            </summary>
+            </value>
         </member>
         <member name="P:KeepCoding.Game.KTInputManager.CurrentControlType">
-            <summary>
+            <value>
             The current way the game is being controlled.
+            </value>
+        </member>
+        <member name="T:KeepCoding.Game.Mission">
+            <summary>
+            Allows access relating to the current mission.
             </summary>
+        </member>
+        <member name="P:KeepCoding.Game.Mission.IsPacingEvents">
+            <value>
+            Determines whether or not all pacing events are enabled.
+            </value>
+        </member>
+        <member name="P:KeepCoding.Game.Mission.Description">
+            <value>
+            The description as it appears in the bomb binder.
+            </value>
+        </member>
+        <member name="P:KeepCoding.Game.Mission.DisplayName">
+            <value>
+            The mission name as it appears in the bomb binder.
+            </value>
+        </member>
+        <member name="P:KeepCoding.Game.Mission.ID">
+            <value>
+            The ID of the mission.
+            </value>
+        </member>
+        <member name="P:KeepCoding.Game.Mission.GeneratorSetting">
+            <value>
+            Gets the generator setting of the mission.
+            </value>
         </member>
         <member name="T:KeepCoding.Game.ModManager">
             <summary>

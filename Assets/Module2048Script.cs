@@ -66,7 +66,7 @@ public class Module2048Script : ModuleScript
 
 	public override void OnActivate()
 	{
-		if (TwitchPlaysActive || Get<TP2048Script>().IsTwitchPlaysActive())
+		if (Get<TP2048Script>().TwitchPlaysActive)
 		{
 			Goal = 32;
 			VersionTitle.text = "twitch";
@@ -331,8 +331,10 @@ public class Module2048Script : ModuleScript
 
 					if (next != null && next.Value == tile.Value && next.MergedFrom == null)
 					{
-						DigTile merged = new DigTile(positions.Next, tile.Value * 2);
-						merged.MergedFrom = new List<DigTile> { tile, next };
+						DigTile merged = new DigTile(positions.Next, tile.Value * 2)
+						{
+							MergedFrom = new List<DigTile> { tile, next }
+						};
 
 						grid.InsertTile(merged);
 						grid.RemoveTile(tile);
@@ -519,7 +521,7 @@ public class Module2048Script : ModuleScript
 
 	private void GameOver()
 	{
-		Strike("Out of moves!");
+		if (!IsSolved) Strike("Out of moves, resetting!");
 		Reset();
 	}
 

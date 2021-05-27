@@ -585,6 +585,7 @@ GameObject:
   - component: {fileID: 114430574261187180}
   - component: {fileID: 114140399508950130}
   - component: {fileID: 114094087081694352}
+  - component: {fileID: 114832241586131268}
   - component: {fileID: 114843997798024564}
   - component: {fileID: 114442551269354822}
   m_Layer: 0
@@ -2637,8 +2638,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d461d5f418759c418916968212b7852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TwitchHelpMessage: '!{0} move up | !{0} move d | !{0} reset | IMPORTANT: You only
-    need to get to the 32 tile to solve the module.'
+  TwitchHelpMessage: '!{0} m up | !{0} move d | !{0} reset | IMPORTANT: You only need
+    to get to the 32 tile to solve the module.'
+  TwitchPlaysActive: 0
 --- !u!114 &114445355206332836
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2859,6 +2861,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HighlightScale: {x: 1, y: 1, z: 1}
   OutlineAmount: 0
+--- !u!114 &114832241586131268
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1783089377010868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1264711295, guid: 8d00b3b1db9435d429b11f7b1bb19cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: 2048
 --- !u!114 &114843997798024564
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2870,7 +2884,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd0a726db9f9d0746a035cfc9c09c49d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModBundleName: 2048
   Size: 4
   Goal: 256
   AnchorsWrapper: {fileID: 4513592122051240}
