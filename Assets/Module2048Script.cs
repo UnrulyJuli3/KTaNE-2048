@@ -66,7 +66,7 @@ public class Module2048Script : ModuleScript
 
 	public override void OnActivate()
 	{
-		if (Get<TP2048Script>().TwitchPlaysActive)
+		if (Get<TP2048Script>().IsTP)
 		{
 			Goal = 32;
 			VersionTitle.text = "twitch";

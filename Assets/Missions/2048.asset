@@ -20,7 +20,7 @@ MonoBehaviour:
     TimeLimit: 15
     NumStrikes: 1
     TimeBeforeNeedyActivation: 90
-    FrontFaceOnly: 0
+    FrontFaceOnly: 1
     OptionalWidgetCount: 5
     ComponentPools:
     - Count: 1
