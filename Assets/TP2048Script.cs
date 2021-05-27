@@ -1,12 +1,8 @@
 ﻿using KeepCoding;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class TP2048Script : TPScript<Module2048Script>
 {
-	public bool TwitchPlaysActive;
-
 	private Module2048Script.Direction GetDirection(string phrase)
 	{
 		switch (phrase)

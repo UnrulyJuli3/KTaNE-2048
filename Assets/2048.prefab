@@ -2640,7 +2640,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TwitchHelpMessage: '!{0} m up | !{0} move d | !{0} reset | IMPORTANT: You only need
     to get to the 32 tile to solve the module.'
-  TwitchPlaysActive: 0
 --- !u!114 &114445355206332836
 MonoBehaviour:
   m_ObjectHideFlags: 1
