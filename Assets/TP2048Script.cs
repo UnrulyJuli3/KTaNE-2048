@@ -1,8 +1,13 @@
 ﻿using KeepCoding;
 using System.Collections;
+using UnityEngine;
 
 public class TP2048Script : TPScript<Module2048Script>
 {
+#pragma warning disable CS0109
+	public static new bool TwitchPlaysActive;
+#pragma warning restore CS0109
+
 	private Module2048Script.Direction GetDirection(string phrase)
 	{
 		switch (phrase)
@@ -52,22 +57,26 @@ public class TP2048Script : TPScript<Module2048Script>
 		yield break;
 	}
 
+	private Module2048Script.PredictedMove GetCurrentPredictedMove()
+	{
+		return new Module2048Script.PredictedMove(Module.CurrentScore, Module.grid, Module2048Script.Direction.Reset);
+	}
 
-	// i will make an actual autosolver eventually
 	public override IEnumerator TwitchHandleForcedSolve()
 	{
 		yield return null;
-		
-		// free up cells if there are none to put the goal tile
-		if (!Module.grid.CellsAvailable()) Module.grid.Cells = new DigTile[Module.Size, Module.Size];
-
-		// add goal tile
-		Module.AddRandomTile(Module.Goal);
-
-		// display
-		Module.Actuate();
-
-		// actuate doesn't actually do the solving calculations so... solve manually
-		Module.Solve();
+		if (Module.lastMovedDirection != Module2048Script.Direction.Reset) Module.MoveDirection(Module2048Script.Direction.Reset);
+		while (!Module.IsSolved)
+		{
+			yield return new WaitForSecondsRealtime(0.1f);
+			Module2048Script.PredictedMove currentMove = GetCurrentPredictedMove();
+			Module2048Script.PredictedMove bestMove = null;
+			for (int i = 0; i < 4; i++)
+			{
+				Module2048Script.PredictedMove newMove = Module2048Script.CalculateMove(Module.Size, currentMove, (Module2048Script.Direction)i);
+				if (bestMove == null || newMove.NewScore > bestMove.NewScore) bestMove = newMove;
+			}
+			Module.MoveDirection(bestMove.MoveDirection);
+		}
 	}
 }

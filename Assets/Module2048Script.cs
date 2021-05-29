@@ -12,6 +12,8 @@ public class Module2048Script : ModuleScript
 	public int Size;
 	public int Goal;
 
+	public GameObject ErrorDefault;
+	public GameObject NonError;
 	public Transform AnchorsWrapper;
 	public GameObject BlankTile;
 	public GameTile TileObject;
@@ -32,10 +34,13 @@ public class Module2048Script : ModuleScript
 	private bool hasWon2048;
 
 	private int currentScoreValue;
-	private int CurrentScore { get { return currentScoreValue; } set { currentScoreValue = value; ScoreLabel.text = string.Format("{0:n0}", currentScoreValue); } }
+	internal int CurrentScore { get { return currentScoreValue; } set { currentScoreValue = value; ScoreLabel.text = string.Format("{0:n0}", currentScoreValue); } }
 
 	private void Start()
 	{
+		NonError.SetActive(true);
+		ErrorDefault.SetActive(false);
+
 		Log("Setup [{0}]", Size);
 		HideDirectionHighlights(false);
 
@@ -66,7 +71,7 @@ public class Module2048Script : ModuleScript
 
 	public override void OnActivate()
 	{
-		if (Get<TP2048Script>().IsTP)
+		if (TP2048Script.TwitchPlaysActive)
 		{
 			Goal = 32;
 			VersionTitle.text = "twitch";
@@ -229,10 +234,13 @@ public class Module2048Script : ModuleScript
 		return new Coord(0, 1);
 	}
 
+	internal Direction lastMovedDirection;
+
 	internal void MoveDirection(Direction direction)
 	{
 		if (justWon2048 && !direction.Equals(Direction.Reset)) return;
 
+		lastMovedDirection = direction;
 		ButtonEffect(DirectionButtons[(int)direction], 0.5f, KMSoundOverride.SoundEffect.ButtonPress);
 
 		if (direction.Equals(Direction.Reset))
@@ -301,9 +309,76 @@ public class Module2048Script : ModuleScript
 
 	private void MoveTile(DigTile tile, Coord cell)
 	{
+		MoveTile(grid, tile, cell);
+	}
+
+	private static void MoveTile(Grid2048 grid, DigTile tile, Coord cell)
+	{
 		grid.Cells[tile.Y, tile.X] = null;
 		grid.Cells[cell.y, cell.x] = tile;
 		tile.UpdatePosition(cell);
+	}
+
+	internal class PredictedMove
+	{
+		public int NewScore;
+		public Grid2048 Grid;
+		public Direction MoveDirection;
+		public PredictedMove(int score, Grid2048 grid, Direction direction)
+		{
+			NewScore = score;
+			Grid = grid;
+			MoveDirection = direction;
+		}
+	}
+
+	internal static PredictedMove CalculateMove(int size, PredictedMove previousMove, Direction direction)
+	{
+		int score = (int)previousMove.NewScore;
+		Grid2048 previousGrid = new Grid2048(previousMove.Grid);
+
+		bool moved = false;
+
+		Coord cell;
+		DigTile tile;
+
+		Coord vector = GetDirectionalOffset(direction);
+		Traversals traversals = Traversals.BuildTraversals(size, vector);
+
+		foreach (int x in traversals.x)
+		{
+			foreach (int y in traversals.y)
+			{
+				cell = new Coord(x, y);
+				tile = previousGrid.CellContent(cell);
+
+				if (tile != null)
+				{
+					FarthestPosition positions = FindFarthestPosition(previousGrid, cell, vector);
+					DigTile next = previousGrid.CellContent(positions.Next);
+
+					if (next != null && next.Value == tile.Value && next.MergedFrom == null)
+					{
+						DigTile merged = new DigTile(positions.Next, tile.Value * 2)
+						{
+							MergedFrom = new List<DigTile> { tile, next }
+						};
+
+						previousGrid.InsertTile(merged);
+						previousGrid.RemoveTile(tile);
+
+						tile.UpdatePosition(positions.Next);
+
+						score += merged.Value;
+					}
+					else MoveTile(previousGrid, tile, positions.Farthest);
+
+					if (!PositionsEqual(cell, tile)) moved = true;
+				}
+			}
+		}
+
+		return new PredictedMove(moved ? score : -1, previousGrid, direction);
 	}
 
 	private void Move(Direction direction)
@@ -405,6 +480,11 @@ public class Module2048Script : ModuleScript
 
 	private FarthestPosition FindFarthestPosition(Coord cell, Coord vector)
 	{
+		return FindFarthestPosition(grid, cell, vector);
+	}
+
+	private static FarthestPosition FindFarthestPosition(Grid2048 grid, Coord cell, Coord vector)
+	{
 		Coord previous;
 
 		do
@@ -416,23 +496,23 @@ public class Module2048Script : ModuleScript
 		return new FarthestPosition(previous, cell);
 	}
 
-	private bool PositionsEqual(Coord first, DigTile second)
+	private static bool PositionsEqual(Coord first, DigTile second)
 	{
 		return PositionsEqual(first, new Coord(second.X, second.Y));
 	}
 
-	private bool PositionsEqual(Coord first, Coord second)
+	private static bool PositionsEqual(Coord first, Coord second)
 	{
 		return first.x == second.x && first.y == second.y;
 	}
 
 
-	private readonly List<GameTile> ActuateddTiles = new List<GameTile>();
+	private readonly List<GameTile> ActuatedTiles = new List<GameTile>();
 
 	internal void Actuate()
 	{
-		foreach (GameTile tile in ActuateddTiles) Destroy(tile.gameObject);
-		ActuateddTiles.Clear();
+		foreach (GameTile tile in ActuatedTiles) Destroy(tile.gameObject);
+		ActuatedTiles.Clear();
 
 		foreach (DigTile tile in grid.Cells) if (tile != null) ActuateTile(tile);
 	}
@@ -459,7 +539,7 @@ public class Module2048Script : ModuleScript
 		}
 		else StartCoroutine(TileAddNew(gameTile.transform));
 
-		ActuateddTiles.Add(gameTile);
+		ActuatedTiles.Add(gameTile);
 	}
 
 	private IEnumerator ActuateTileToPosition(Transform tile, Coord oldPosition, Coord newPosition)

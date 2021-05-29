@@ -14,6 +14,13 @@ public class Grid2048
 		Size = size;
 	}
 
+	public Grid2048(Grid2048 grid)
+	{
+		Size = grid.Size;
+		Cells = new DigTile[Size, Size];
+		grid.EachCell((x, y, tile) => Cells[y, x] = tile == null ? null : new DigTile(tile));
+	}
+
 	public Coord RandomAvailableCell()
 	{
 		if (CellsAvailable()) return AvailableCells().PickRandom();
