@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class TP2048Script : TPScript<Module2048Script>
 {
-#pragma warning disable CS0109
-	public static new bool TwitchPlaysActive;
-#pragma warning restore CS0109
-
 	private Module2048Script.Direction GetDirection(string phrase)
 	{
 		switch (phrase)
@@ -30,7 +26,7 @@ public class TP2048Script : TPScript<Module2048Script>
 		return Module2048Script.Direction.Reset;
 	}
 
-	public override IEnumerator ProcessTwitchCommand(string command)
+	public override IEnumerator Process(string command)
 	{
 		string[] split = command.ToLowerInvariant().Split();
 		switch (split[0])
@@ -62,7 +58,7 @@ public class TP2048Script : TPScript<Module2048Script>
 		return new Module2048Script.PredictedMove(Module.CurrentScore, Module.grid, Module2048Script.Direction.Reset);
 	}
 
-	public override IEnumerator TwitchHandleForcedSolve()
+	public override IEnumerator ForceSolve()
 	{
 		yield return null;
 		if (Module.lastMovedDirection != Module2048Script.Direction.Reset) Module.MoveDirection(Module2048Script.Direction.Reset);
